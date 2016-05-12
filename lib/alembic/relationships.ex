@@ -324,7 +324,7 @@ defmodule Alembic.Relationships do
       ...>         attributes: %{"name" => "Alice"},
       ...>         type: "author"
       ...>       }
-      ...>     },
+      ...>     }
       ...>   },
       ...>   %{}
       ...> )
@@ -333,6 +333,35 @@ defmodule Alembic.Relationships do
           "name" => "Alice"
         }
       }
+
+  ### Not Included
+
+  If a relationship is not included, then no linkage `data` may be present and `{:error, :unset}` will be returned
+  from `Alembic.Relationshio.to_params/3`.  For those relationships, they will not appear in the params
+  of all relationships.
+
+      iex> Alembic.Relationships.to_params(
+      ...>   %{
+      ...>     "author" => %Alembic.Relationship{
+      ...>       data: %Alembic.Resource{
+      ...>         attributes: %{"name" => "Alice"},
+      ...>         type: "author"
+      ...>       }
+      ...>     },
+      ...>     "comments" => %Alembic.Relationship{
+      ...>       links: %{
+      ...>         "related" => "https://example.com/api/v1/posts/1/comments"
+      ...>       }
+      ...>     }
+      ...>   },
+      ...>   %{}
+      ...> )
+      %{
+        "author" => %{
+          "name" => "Alice"
+        }
+      }
+
   """
   @spec to_params(nil, ToParams.resource_by_id_by_type) :: %{}
   @spec to_params(t, ToParams.resource_by_id_by_type) :: ToParams.params
@@ -345,8 +374,13 @@ defmodule Alembic.Relationships do
 
   @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
   def to_params(relationship_by_name = %{}, resource_by_id_by_type = %{}, converted_by_id_by_type) do
-    Enum.into relationship_by_name, %{}, fn {name, relationship} ->
-      {name, Relationship.to_params(relationship, resource_by_id_by_type, converted_by_id_by_type)}
+    Enum.reduce relationship_by_name, %{}, fn {name, relationship}, acc ->
+      case Relationship.to_params(relationship, resource_by_id_by_type, converted_by_id_by_type) do
+        {:error, :unset} ->
+          acc
+        relationship_params ->
+          Map.put(acc, name, relationship_params)
+      end
     end
   end
 

@@ -904,6 +904,77 @@ defmodule Alembic.Resource do
         text: "First!"
       }
 
+  If the relationships does not have have an id (as may be the case where the server does not include linkage data
+  always), then the association will be be `nil` as will its foriegn key.
+
+      iex> Alembic.Resource.to_ecto_schema(
+      ...>   %Alembic.Resource{
+      ...>     attributes: %{"text" => "First!"},
+      ...>     relationships: %{
+      ...>       "author" => %Alembic.Relationship{
+      ...>         links:  %{
+      ...>           "related" => "https://example.com/api/v1/posts/1/author"
+      ...>         }
+      ...>       }
+      ...>     },
+      ...>     type: "post"
+      ...>   },
+      ...>   %{},
+      ...>   %{
+      ...>     "author" => Alembic.TestAuthor,
+      ...>     "post" => Alembic.TestPost
+      ...>   }
+      ...> )
+      %Alembic.TestPost{
+        __meta__: %Ecto.Schema.Metadata{
+          source: {nil, "posts"},
+          state: :built
+        },
+        author: nil,
+        author_id: nil,
+        text: "First!"
+      }
+
+  If a relationship does not exist on the Ecto.Schema struct as an association, then it is ignored, so that incomplete
+  models can be used and the sending and receiving-side don't have to remain in strict sync.
+
+      iex> Alembic.Resource.to_ecto_schema(
+      ...>   %Alembic.Resource{
+      ...>     attributes: %{"text" => "First!"},
+      ...>     relationships: %{
+      ...>       "author" => %Alembic.Relationship{
+      ...>         data: %Alembic.ResourceIdentifier{id: 1, type: "author"}
+      ...>       },
+      ...>       "editor" => %Alembic.Relationship{
+      ...>         links: %{
+      ...>           "related" => "https://example.com/api/v1/posts/1/editor"
+      ...>         }
+      ...>       }
+      ...>     },
+      ...>     type: "post"
+      ...>   },
+      ...>   %{},
+      ...>   %{
+      ...>     "author" => Alembic.TestAuthor,
+      ...>     "post" => Alembic.TestPost
+      ...>   }
+      ...> )
+      %Alembic.TestPost{
+        __meta__: %Ecto.Schema.Metadata{
+          source: {nil, "posts"},
+          state: :built
+        },
+        author: %Alembic.TestAuthor{
+          __meta__: %Ecto.Schema.Metadata{
+            source: {nil, "authors"},
+            state: :built
+          },
+          id: 1
+        },
+        author_id: 1,
+        text: "First!"
+      }
+
   """
   @spec to_ecto_schema(t, ToParams.resource_by_id_by_type, ToEctoSchema.ecto_schema_module_by_type) :: struct
   def to_ecto_schema(resource = %__MODULE__{relationships: relationships},
@@ -918,22 +989,8 @@ defmodule Alembic.Resource do
     relationships
     |> Relationships.to_ecto_schema(resource_by_id_by_type, ecto_schema_module_by_type)
     |> Enum.reduce(resource_struct, fn ({string_name, relationship_ecto_schema}, acc) ->
-        key = String.to_existing_atom(string_name)
-
-        acc = case resource_ecto_schema_module.__schema__(:association, key) do
-          %Ecto.Association.BelongsTo{owner_key: owner_key} ->
-            Map.put(acc, owner_key, relationship_ecto_schema.id)
-          _ ->
-            acc
-        end
-
-        # see https://github.com/elixir-lang/elixir/blob/v1.2.3/lib/elixir/lib/kernel.ex#L1608-L1611
-        if :maps.is_key(key, acc) and key != :__struct__ do
-          :maps.put(key, relationship_ecto_schema, acc)
-        else
-          acc
-        end
-      end)
+         put_relationship(acc, string_name, relationship_ecto_schema, resource_ecto_schema_module)
+       end)
   end
 
   @doc """
@@ -1051,6 +1108,46 @@ defmodule Alembic.Resource do
                                                                              sender in [:client, :server]) or
                                                                             (action == :create and sender == :server) do
     put_in @id_options[:member][:required], true
+  end
+
+  defp put_association(acc, association_name, association_value) do
+    # see https://github.com/elixir-lang/elixir/blob/v1.2.3/lib/elixir/lib/kernel.ex#L1608-L1611
+    if :maps.is_key(association_name, acc) and association_name != :__struct__ do
+      :maps.put(association_name, association_value, acc)
+    else
+      acc
+    end
+  end
+
+  defp put_foreign_key(acc, %Ecto.Association.BelongsTo{owner_key: owner_key}, association_value) do
+    put_owner_key(acc, owner_key, association_value)
+  end
+
+  defp put_foreign_key(acc, _, _), do: acc
+
+  defp put_owner_key(acc, owner_key, %{id: id}), do: Map.put(acc, owner_key, id)
+  defp put_owner_key(acc, _, _), do: acc
+
+  defp put_relationship(acc, relationship_name, value, resource_ecto_schema_module) do
+    case relationship_name_to_association_name(relationship_name) do
+      nil -> acc
+      association_name ->
+        association = resource_ecto_schema_module.__schema__(:association, association_name)
+
+        acc
+        |> put_foreign_key(association, value)
+        |> put_association(association_name, value)
+    end
+  end
+
+  defp relationship_name_to_association_name(relationship_name) do
+    try do
+      String.to_existing_atom(relationship_name)
+    rescue
+      _ in ArgumentError -> nil
+    else
+      association_name -> association_name
+    end
   end
 
   # Protocol Implementations

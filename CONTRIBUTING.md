@@ -15,6 +15,7 @@
 1. Ensure all unit and doctests pass: `mix test`
 2. Ensure all style and consistency checks pass: `mix credo --strict`
 3. Ensure no dialyzer warnings: `mix dialyze`
+4. Ensure no "Closing unclosed backquotes" in docs: `mix docs`
 
 ## Pull Request
 

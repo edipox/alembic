@@ -31,7 +31,7 @@ defmodule Alembic.Fetch.Includes do
   # Functions
 
   @doc """
-  Extract `t` from `"include"` in `params
+  Extract `t` from `"include"` in `params`
 
   `params` without `"include"` will have no includes
 

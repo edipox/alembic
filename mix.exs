@@ -48,11 +48,11 @@ defmodule Alembic.Mixfile do
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
-      {:earmark, "~> 0.2.1", only: :dev},
+      {:earmark, "~> 0.2.1", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
       {:ecto, "~> 1.0"},
       # documentation generation
-      {:ex_doc, "~> 0.11.5", only: :dev},
+      {:ex_doc, "~> 0.11.5", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI

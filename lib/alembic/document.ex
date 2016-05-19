@@ -150,6 +150,120 @@ defmodule Alembic.Document do
   # Functions
 
   @doc """
+  Tries to determine the common `Alembic.Error.t` `status` between all `errors` in the `document`.
+
+  If it is not an errors document, `nil` is returned.
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{data: []}
+      ...> )
+      nil
+
+  # Single error
+
+  If there is one error, its status is returned.  This could be nil as no field is required in a JSONAPI error.
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{
+      ...>         status: "404"
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> )
+      "404"
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{}
+      ...>     ]
+      ...>   }
+      ...> )
+      nil
+
+  # Multiple errors
+
+  If there are multiple errors with the same status, then that is the consensus
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{
+      ...>         status: "404"
+      ...>       },
+      ...>       %Alembic.Error{
+      ...>         status: "404"
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> )
+      "404"
+
+  If there are multiple errors, but some errors don't have statuses, they are ignored
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{},
+      ...>       %Alembic.Error{
+      ...>         status: "404"
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> )
+      "404"
+
+  If there are multiple errors, but they disagree within the same 100s block, then that is the consensus
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{
+      ...>         status: "404"
+      ...>       },
+      ...>       %Alembic.Error{
+      ...>         status: "422"
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> )
+      "400"
+
+  If there are multiple errors, but they disagree without the same 100s block, then the greater 100s block is the
+  consensus
+
+      iex> Alembic.Document.error_status_consensus(
+      ...>   %Alembic.Document{
+      ...>     errors: [
+      ...>       %Alembic.Error{
+      ...>         status: "422"
+      ...>       },
+      ...>       %Alembic.Error{
+      ...>         status: "500"
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> )
+      "500"
+
+  """
+  def error_status_consensus(%__MODULE__{errors: nil}), do: nil
+
+  def error_status_consensus(%__MODULE__{errors: errors}) do
+    Enum.reduce errors, nil, fn
+      %Error{status: status}, nil -> status
+      %Error{status: status}, status -> status
+      %Error{status: status}, consensus ->
+        status_block_integer = div(String.to_integer(status), 100)
+        consensus_block_integer = div(String.to_integer(consensus), 100)
+
+        max_block_integer = max(status_block_integer, consensus_block_integer)
+        to_string(max_block_integer * 100)
+    end
+  end
+
+  @doc """
   Converts a JSON object into a JSON API Document, `t`.
 
   ## Data documents

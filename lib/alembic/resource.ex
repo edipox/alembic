@@ -904,6 +904,37 @@ defmodule Alembic.Resource do
         text: "First!"
       }
 
+  If the relationships does not have have an id (as may be the case where the server does not include linkage data
+  always), then the association will be be `nil` as will its foriegn key.
+
+      iex> Alembic.Resource.to_ecto_schema(
+      ...>   %Alembic.Resource{
+      ...>     attributes: %{"text" => "First!"},
+      ...>     relationships: %{
+      ...>       "author" => %Alembic.Relationship{
+      ...>         links:  %{
+      ...>           "related" => "https://example.com/api/v1/posts/1/author"
+      ...>         }
+      ...>       }
+      ...>     },
+      ...>     type: "post"
+      ...>   },
+      ...>   %{},
+      ...>   %{
+      ...>     "author" => Alembic.TestAuthor,
+      ...>     "post" => Alembic.TestPost
+      ...>   }
+      ...> )
+      %Alembic.TestPost{
+        __meta__: %Ecto.Schema.Metadata{
+          source: {nil, "posts"},
+          state: :built
+        },
+        author: nil,
+        author_id: nil,
+        text: "First!"
+      }
+
   """
   @spec to_ecto_schema(t, ToParams.resource_by_id_by_type, ToEctoSchema.ecto_schema_module_by_type) :: struct
   def to_ecto_schema(resource = %__MODULE__{relationships: relationships},
@@ -922,7 +953,7 @@ defmodule Alembic.Resource do
 
         acc = case resource_ecto_schema_module.__schema__(:association, key) do
           %Ecto.Association.BelongsTo{owner_key: owner_key} ->
-            Map.put(acc, owner_key, relationship_ecto_schema.id)
+            put_owner_key(acc, owner_key, relationship_ecto_schema)
           _ ->
             acc
         end
@@ -1052,6 +1083,9 @@ defmodule Alembic.Resource do
                                                                             (action == :create and sender == :server) do
     put_in @id_options[:member][:required], true
   end
+
+  defp put_owner_key(acc, owner_key, %{id: id}), do: Map.put(acc, owner_key, id)
+  defp put_owner_key(acc, _, _), do: acc
 
   # Protocol Implementations
 

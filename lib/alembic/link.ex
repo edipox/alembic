@@ -8,6 +8,7 @@ defmodule Alembic.Link do
   alias Alembic.Error
   alias Alembic.FromJson
   alias Alembic.Meta
+  alias Alembic.Pagination.Page
 
   # Behaviours
 
@@ -279,6 +280,35 @@ defmodule Alembic.Link do
         ]
       }
     }
+  end
+
+  @doc """
+  Extracts `Alembic.Pagination.Page.t` `number` from `url` `"page[number]"` and `size` from `url`
+  `"page[size]"`.
+
+      iex> Alembic.Link.to_page("https://example.com/api/v1/users?page%5Bnumber%5D=2&page%5Bsize%5D=10")
+      %Alembic.Pagination.Page{number: 2, size: 10}
+
+  If a `url` does not have both `"page[number]"` and `"page[size]"` then `nil` is returned
+
+      iex> Alembic.Link.to_page("https://example.com/api/v1/users?page%5Bnumber%5D=2")
+      nil
+      iex> Alembic.Link.to_page("https://example.com/api/v1/users?page%5Bsize%5D=10")
+      nil
+      iex> Alembic.Link.to_page("https://example.com/api/v1/users?q=")
+      nil
+
+  If a `url` does not have a query then `nil` is returned
+
+      iex> Alembic.Link.to_page("https://example.com/api/v1/users")
+      nil
+
+  """
+  @spec to_page(link) :: Page.t
+  def to_page(url) when is_binary(url) do
+    url
+    |> URI.parse
+    |> Page.from_uri
   end
 
   ## Private Functions

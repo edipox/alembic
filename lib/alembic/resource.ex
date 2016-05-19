@@ -977,20 +977,10 @@ defmodule Alembic.Resource do
 
   """
   @spec to_ecto_schema(t, ToParams.resource_by_id_by_type, ToEctoSchema.ecto_schema_module_by_type) :: struct
-  def to_ecto_schema(resource = %__MODULE__{relationships: relationships},
-                     resource_by_id_by_type,
-                     ecto_schema_module_by_type) do
-
+  def to_ecto_schema(resource = %__MODULE__{type: type}, resource_by_id_by_type, ecto_schema_module_by_type) do
     params = to_params(resource, resource_by_id_by_type)
-    resource_struct = ToEctoSchema.to_ecto_schema(resource, params, ecto_schema_module_by_type)
-    resource_ecto_schema_module = Map.fetch!(ecto_schema_module_by_type, resource.type)
-
-    # can't use Ecto.Changeset.cast as it doesn't work on belongs_to associations.
-    relationships
-    |> Relationships.to_ecto_schema(resource_by_id_by_type, ecto_schema_module_by_type)
-    |> Enum.reduce(resource_struct, fn ({string_name, relationship_ecto_schema}, acc) ->
-         put_relationship(acc, string_name, relationship_ecto_schema, resource_ecto_schema_module)
-       end)
+    resource_ecto_schema_module = Map.fetch!(ecto_schema_module_by_type, type)
+    ToEctoSchema.to_ecto_schema(params, resource_ecto_schema_module)
   end
 
   @doc """
@@ -1048,20 +1038,35 @@ defmodule Alembic.Resource do
       }
   """
   @spec to_params(t, ToParams.resource_by_id_by_type) :: ToParams.params
-  def to_params(resource, attributes_by_id_by_type)
+  def to_params(resource, resource_by_id_by_type), do: to_params(resource, resource_by_id_by_type, %{})
 
-  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: relationships},
-                resource_by_id_by_type = %{}) do
-    params = attributes || %{}
+  @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
+  def to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
 
-    params = case id do
+  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: relationships, type: type},
+                resource_by_id_by_type,
+                converted_by_id_by_type) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
+    case get_in(converted_by_id_by_type, [type, id]) do
+      true ->
+        %{"id" => id}
       nil ->
-        params
-      _ ->
-        Map.put(params, "id", id)
-    end
+        params = attributes || %{}
 
-    Map.merge(params, Relationships.to_params(relationships, resource_by_id_by_type))
+        params = case id do
+          nil ->
+            params
+          _ ->
+            Map.put(params, "id", id)
+        end
+
+        updated_converted_by_id_by_type = converted_by_id_by_type
+                                          |> Map.put_new(type, %{})
+                                          |> put_in([type, id], true)
+        relationships_params = Relationships.to_params(relationships,
+                                                       resource_by_id_by_type,
+                                                       updated_converted_by_id_by_type)
+        Map.merge(params, relationships_params)
+    end
   end
 
   ## Private Functions
@@ -1108,46 +1113,6 @@ defmodule Alembic.Resource do
                                                                              sender in [:client, :server]) or
                                                                             (action == :create and sender == :server) do
     put_in @id_options[:member][:required], true
-  end
-
-  defp put_association(acc, association_name, association_value) do
-    # see https://github.com/elixir-lang/elixir/blob/v1.2.3/lib/elixir/lib/kernel.ex#L1608-L1611
-    if :maps.is_key(association_name, acc) and association_name != :__struct__ do
-      :maps.put(association_name, association_value, acc)
-    else
-      acc
-    end
-  end
-
-  defp put_foreign_key(acc, %Ecto.Association.BelongsTo{owner_key: owner_key}, association_value) do
-    put_owner_key(acc, owner_key, association_value)
-  end
-
-  defp put_foreign_key(acc, _, _), do: acc
-
-  defp put_owner_key(acc, owner_key, %{id: id}), do: Map.put(acc, owner_key, id)
-  defp put_owner_key(acc, _, _), do: acc
-
-  defp put_relationship(acc, relationship_name, value, resource_ecto_schema_module) do
-    case relationship_name_to_association_name(relationship_name) do
-      nil -> acc
-      association_name ->
-        association = resource_ecto_schema_module.__schema__(:association, association_name)
-
-        acc
-        |> put_foreign_key(association, value)
-        |> put_association(association_name, value)
-    end
-  end
-
-  defp relationship_name_to_association_name(relationship_name) do
-    try do
-      String.to_existing_atom(relationship_name)
-    rescue
-      _ in ArgumentError -> nil
-    else
-      association_name -> association_name
-    end
   end
 
   # Protocol Implementations

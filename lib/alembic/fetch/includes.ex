@@ -105,9 +105,14 @@ defmodule Alembic.Fetch.Includes do
   @spec from_string(String.t) :: t
   def from_string(comma_separated_relationship_paths) do
     comma_separated_relationship_paths
-    |> String.splitter(",", trim: true)
+    |> String.splitter(relationship_path_separator, trim: true)
     |> Enum.map(&RelationshipPath.to_include/1)
   end
+
+  @doc """
+  Separates each relationship path in includes
+  """
+  def relationship_path_separator, do: ","
 
   @doc """
   Converts a String-based include that uses relationship names to Atom-based association names used in a preload
@@ -443,6 +448,16 @@ defmodule Alembic.Fetch.Includes do
   def to_relationship_path(include) do
     include
     |> to_relationship_path([])
+  end
+
+  @doc """
+  Converts a list of `include` back to a string
+  """
+  @spec to_string(includes :: [include]) :: String.t
+  def to_string(includes) when is_list(includes) do
+    includes
+    |> Stream.map(&to_relationship_path/1)
+    |> Enum.join(relationship_path_separator)
   end
 
   ## Private Functions

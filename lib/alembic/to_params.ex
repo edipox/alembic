@@ -7,6 +7,13 @@ defmodule Alembic.ToParams do
   # Types
 
   @typedoc """
+  A nested map with the outer layer keyed by the `Alembic.Resource.type`, then the next layer keys by the
+  `Alembic.Resource.id` with the values not being present initially, but being updated to `true` once the
+  `{type, id}` is converted once.
+  """
+  @type converted_by_id_by_type :: %{Resource.type => %{Resource.id => boolean}}
+
+  @typedoc """
   Params format used by [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4).
   """
   @type params :: list | map | nil
@@ -22,7 +29,7 @@ defmodule Alembic.ToParams do
   @doc """
   ## Parameters
 
-  * `any` - an `Alembic.Document.t` hierarchy data structure
+  * `convertable` - an `Alembic.Document.t` hierarchy data structure
   * `resources_by_id_by_type` - A nest map with the outer layer keyed by the `Alembic.Resource.type`,
     then the next layer keyed by the `Alembic.Resource.id` with the values being the full
     `Alembic.Resource.t` from `Alembic.Document.t` `included`.
@@ -34,7 +41,36 @@ defmodule Alembic.ToParams do
   * `[]` - if an empty collection
   * `[%{}]` - if a non-empty collection
   """
-  @callback to_params(any, resource_by_id_by_type) :: params
+  @callback to_params(convertable :: any, resource_by_id_by_type) :: params
+
+  @doc """
+  Unlike `to_params/2`, if `type` and `id` of `convertable` already exists in `converted_by_id_by_type`, then the params
+  returned are only `%{ "id" => id }` without any further expansion, that is, a resource identifier, so that loops are
+  prevented.
+
+  ## Parameters
+
+  * `convertable` - an `Alembic.Document.t` hierarchy data structure
+  * `resources_by_id_by_type` - A nest map with the outer layer keyed by the `Alembic.Resource.type`,
+    then the next layer keyed by the `Alembic.Resource.id` with the values being the full
+    `Alembic.Resource.t` from `Alembic.Document.t` `included`.
+  * `converted_by_id_by_type` - Tracks which (type, id) have been converted already to prevent infinite recursion when
+    expanding indirect relationships.
+
+  ## Returns
+
+  ### Success
+
+  * `{nil}` if an empty singleton
+  * `%{}` - if a non-empty singleton
+  * `[]` - if an empty collection
+  * `[%{}]` - if a non-empty collection
+
+  ### Errors
+
+  * `{:error, :already_converted}` - if the `type` and `id` of `convertable` already exists in `converted_by_id_by_type`
+  """
+  @callback to_params(convertable :: any, resource_by_id_by_type, converted_by_id_by_type) :: params
 
   # Functions
 

@@ -1724,7 +1724,7 @@ defmodule Alembic.Document do
   @spec to_params(t) :: [map] | map
   def to_params(document = %__MODULE__{}) do
     resource_by_id_by_type = included_resource_by_id_by_type(document)
-    to_params(document, resource_by_id_by_type)
+    to_params(document, resource_by_id_by_type, %{})
   end
 
   @doc """
@@ -1736,16 +1736,27 @@ defmodule Alembic.Document do
   """
   @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
                   ToParams.resource_by_id_by_type) :: ToParams.params
+  def to_params(document, resource_by_id_by_type), do: to_params(document, resource_by_id_by_type, %{})
 
-  def to_params(%__MODULE__{data: data}, resource_by_id_by_type) when is_list(data) do
-    Enum.map(data, &Resource.to_params(&1, resource_by_id_by_type))
+  @doc """
+  Transforms a `t` into the nested params format used by
+  [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) using the given
+  `resources_by_id_by_type` and `converted_by_id_by_type`.
+
+  See `InterpreterServer.Api.Document.to_params/1`
+  """
+  @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
+                  ToParams.resource_by_id_by_type,
+                  ToParams.converted_by_id_by_type) :: ToParams.params
+  def to_params(%__MODULE__{data: data}, resource_by_id_by_type, converted_by_id_by_type) when is_list(data) do
+    Enum.map(data, &Resource.to_params(&1, resource_by_id_by_type, converted_by_id_by_type))
   end
 
-  def to_params(%__MODULE__{data: resource = %Resource{}}, resource_by_id_by_type) do
-    Resource.to_params(resource, resource_by_id_by_type)
+  def to_params(%__MODULE__{data: resource = %Resource{}}, resource_by_id_by_type, converted_by_id_by_type) do
+    Resource.to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
   end
 
-  def to_params(%__MODULE__{data: nil}, _), do: %{}
+  def to_params(%__MODULE__{data: nil}, _, _), do: %{}
 
   ## Private functions
 

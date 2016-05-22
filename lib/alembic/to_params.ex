@@ -36,12 +36,18 @@ defmodule Alembic.ToParams do
 
   ## Returns
 
+  ### Success
+
   * `nil` if an empty singleton
   * `%{}` - if a non-empty singleton
   * `[]` - if an empty collection
   * `[%{}]` - if a non-empty collection
+
+  ### Errors
+
+  * `{:error, :unset}` - if the `convertable` data is not set
   """
-  @callback to_params(convertable :: any, resource_by_id_by_type) :: params
+  @callback to_params(convertable :: any, resource_by_id_by_type) :: params | {:error, :unset}
 
   @doc """
   Unlike `to_params/2`, if `type` and `id` of `convertable` already exists in `converted_by_id_by_type`, then the params
@@ -69,8 +75,11 @@ defmodule Alembic.ToParams do
   ### Errors
 
   * `{:error, :already_converted}` - if the `type` and `id` of `convertable` already exists in `converted_by_id_by_type`
+  * `{:error, :unset}` - if the `convertable` data is not set
   """
-  @callback to_params(convertable :: any, resource_by_id_by_type, converted_by_id_by_type) :: params
+  @callback to_params(convertable :: any,
+                      resource_by_id_by_type,
+                      converted_by_id_by_type) :: params | {:error, :already_converted | :unset}
 
   # Functions
 

@@ -54,7 +54,7 @@ defmodule Alembic.Relationship do
                 }
   # Struct
 
-  defstruct data: nil,
+  defstruct data: :unset,
             links: nil,
             meta: nil
 
@@ -79,7 +79,7 @@ defmodule Alembic.Relationship do
   > </cite>
   """
   @type t :: %__MODULE__{
-               data: [ResourceIdentifier.t] | ResourceIdentifier.t,
+               data: [ResourceIdentifier.t] | ResourceIdentifier.t | nil | :unset,
                links: Links.links,
                meta: Meta.t
              }
@@ -258,6 +258,31 @@ defmodule Alembic.Relationship do
               title: "Type is wrong"
             }
           ]
+        }
+      }
+
+  ### Not Loaded
+
+  A relationship may have no data, neither `nil` nor an empty list, when the server only includes the linkage data
+  when `include=<relationship-name>` is passed.  In such as case, the `Alembic.Relationship.t` will
+  have `:unset` for the `data` to differentiate it from `nil`, which represent an empty to-one relationship where
+  `"data": null` was in the encoded JSON.
+
+      iex> Alembic.Relationship.from_json(
+      ...>   %{"links" => %{"related" => "http://example.com/api/v1/posts/1/comments"}},
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/data/relationships/comments"
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :ok,
+        %Alembic.Relationship{
+          data: :unset,
+          links: %{
+            "related" => "http://example.com/api/v1/posts/1/comments"
+          }
         }
       }
 
@@ -494,8 +519,20 @@ defmodule Alembic.Relationship do
         }
       ]
 
+  ## Not Included
+
+  If a relationship is not included, then no linkage `data` may be present and `{:error, :unset}` will be returned
+
+      iex> Alembic.Relationship.to_params(
+      ...>   %Alembic.Relationship{
+      ...>     data: :unset
+      ...>   },
+      ...>   %{}
+      ...> )
+      {:error, :unset}
+
   """
-  @spec to_params(%__MODULE__{data: any}, ToParams.resource_by_id_by_type) :: ToParams.params
+  @spec to_params(%__MODULE__{data: any}, ToParams.resource_by_id_by_type) :: ToParams.params | {:error, :unset}
   def to_params(relationship, resource_by_id_by_type), do: to_params(relationship, resource_by_id_by_type, %{})
 
   @doc """
@@ -505,8 +542,130 @@ defmodule Alembic.Relationship do
   """
   @spec to_params(%__MODULE__{data: any},
                   ToParams.resource_by_id_by_type,
-                  ToParams.converted_by_id_by_type) :: ToParams.params
+                  ToParams.converted_by_id_by_type) :: ToParams.params | {:error, :already_converted | :unset}
+  def to_params(relationship, resource_by_id_by_type, converted_by_id_by_type)
+
+  def to_params(%__MODULE__{data: :unset}, _, _), do: {:error, :unset}
+
   def to_params(%__MODULE__{data: data}, resource_by_id_by_type, converted_by_id_by_type) do
     ResourceLinkage.to_params(data, resource_by_id_by_type, converted_by_id_by_type)
+  end
+
+  # Protocol Implementations
+
+  defimpl Poison.Encoder do
+    @doc """
+    ## Data
+
+    An `:unset` data is excluded from the JSON
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     data: :unset
+        ...>   }
+        ...> )
+        {:ok, "{}"}
+
+    ### To-One
+
+    A `nil` data is encoded as `null` in the JSON, representing an empty to-one relationship
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     data: nil
+        ...>   }
+        ...> )
+        {:ok, "{\\"data\\":null}"}
+
+    A resource or resource identifier is encoded in the JSON, representing a present to-one relationhip
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     data: %Alembic.ResourceIdentifier{
+        ...>       id: "1",
+        ...>       type: "author"
+        ...>     }
+        ...>   }
+        ...> )
+        {:ok, "{\\"data\\":{\\"type\\":\\"author\\",\\"id\\":\\"1\\"}}"}
+
+    ### To-Many
+
+    An empty list, `[]` is encoded as an empty list `[]` in the JOSN, representing an empty to-many relationship
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     data: []
+        ...>   }
+        ...> )
+        {:ok, "{\\"data\\":[]}"}
+
+    An non-empty list of resources and/or resource identifiers is encoded as a list in the JSON, representing an present
+    to-many relationship
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     data: [
+        ...>       %Alembic.ResourceIdentifier{
+        ...>         id: "1", type: "shirt"
+        ...>       }
+        ...>     ]
+        ...>   }
+        ...> )
+        {:ok, "{\\"data\\":[{\\"type\\":\\"shirt\\",\\"id\\":\\"1\\"}]}"}
+
+    ## Links
+
+    `links` are not encoded when `nil`.
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     links: nil
+        ...>   }
+        ...> )
+        {:ok, "{}"}
+
+    `links` are encoded when present
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     links: %{
+        ...>       "related" => "https://example.com/api/v1/posts/1/comments"
+        ...>     }
+        ...>   }
+        ...> )
+        {:ok, "{\\"links\\":{\\"related\\":\\"https://example.com/api/v1/posts/1/comments\\"}}"}
+
+    ## Meta
+
+    `meta` is not encoded when `nil`.
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     meta: nil
+        ...>   }
+        ...> )
+        {:ok, "{}"}
+
+    `meta` is encoded when present
+
+        iex> Poison.encode(
+        ...>   %Alembic.Relationship{
+        ...>     meta: %{
+        ...>       "version" => "1"
+        ...>     }
+        ...>   }
+        ...> )
+        {:ok, "{\\"meta\\":{\\"version\\":\\"1\\"}}"}
+
+    """
+    def encode(relationship = %@for{}, options) do
+      map = for {field, value} <- Map.from_struct(relationship),
+                (field == :data && value != :unset) || (field != :data && value != nil),
+                into: %{},
+                do: {field, value}
+
+      Poison.Encoder.Map.encode(map, options)
+    end
   end
 end

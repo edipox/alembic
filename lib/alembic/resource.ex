@@ -905,7 +905,7 @@ defmodule Alembic.Resource do
       }
 
   If the relationships does not have have an id (as may be the case where the server does not include linkage data
-  always), then the association will be be `nil` as will its foriegn key.
+  always), then the association will be `%Ecto.Association.NotLoaded{}` and its foriegn key will be `nil`.
 
       iex> Alembic.Resource.to_ecto_schema(
       ...>   %Alembic.Resource{
@@ -930,7 +930,11 @@ defmodule Alembic.Resource do
           source: {nil, "posts"},
           state: :built
         },
-        author: nil,
+        author: %Ecto.Association.NotLoaded{
+          __cardinality__: :one,
+          __field__: :author,
+          __owner__: Alembic.TestPost
+        },
         author_id: nil,
         text: "First!"
       }

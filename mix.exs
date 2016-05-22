@@ -58,7 +58,7 @@ defmodule Alembic.Mixfile do
       # formats test output for CircleCI
       {:junit_formatter, "~> 1.0", only: :test},
       # JSON decode and encoding.  Protocols are implemented for Alembic.* structs
-      {:poison, "~> 2.1"}
+      {:poison, "~> 1.5 or ~> 2.0"}
     ]
   end
 

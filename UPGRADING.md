@@ -3,11 +3,21 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Upgrading](#upgrading)
+  - [v2.0.0](#v200)
   - [v1.0.0](#v100)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Upgrading
+
+## v2.0.0
+
+If you were using the `Alembic.Relationship.resource_identifier` type,
+use `Alembic.ResourceIdentifier.t` instead.
+
+If you were updating relationships by nesting attributes, you now need
+to issue multiple JSONAPI documents to update the primary resource and
+one for each related resource.
 
 ## v1.0.0
 

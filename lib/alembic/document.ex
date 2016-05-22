@@ -358,141 +358,141 @@ defmodule Alembic.Document do
 
   A collection can be a list of resources
 
-     iex> Alembic.Document.from_json(
-     ...>   %{
-     ...>     "data" => [
-     ...>       %{
-     ...>         "attributes" => %{
-     ...>           "text" => "First Post!"
-     ...>         },
-     ...>         "id" => "1",
-     ...>         "relationships" => %{
-     ...>           "comments" => %{
-     ...>             "data" => [
-     ...>               %{
-     ...>                 "id" => "1",
-     ...>                 "type" => "comment"
-     ...>               }
-     ...>             ]
-     ...>           }
-     ...>         },
-     ...>         "type" => "post"
-     ...>       }
-     ...>     ]
-     ...>   },
-     ...>   %Alembic.Error{
-     ...>     meta: %{
-     ...>       "action" => :create,
-     ...>       "sender" => :client
-     ...>     },
-     ...>     source: %Alembic.Source{
-     ...>       pointer: ""
-     ...>     }
-     ...>   }
-     ...> )
-     {
-       :ok,
-       %Alembic.Document{
-         data: [
-           %Alembic.Resource{
-             attributes: %{
-               "text" => "First Post!"
-             },
-             id: "1",
-             relationships: %{
-               "comments" => %Alembic.Relationship{
-                 data: [
-                   %Alembic.ResourceIdentifier{
-                     id: "1",
-                     type: "comment"
-                   }
-                 ]
-               }
-             },
-             type: "post"
-           }
-         ]
-       }
-     }
+      iex> Alembic.Document.from_json(
+      ...>   %{
+      ...>     "data" => [
+      ...>       %{
+      ...>         "attributes" => %{
+      ...>           "text" => "First Post!"
+      ...>         },
+      ...>         "id" => "1",
+      ...>         "relationships" => %{
+      ...>           "comments" => %{
+      ...>             "data" => [
+      ...>               %{
+      ...>                 "id" => "1",
+      ...>                 "type" => "comment"
+      ...>               }
+      ...>             ]
+      ...>           }
+      ...>         },
+      ...>         "type" => "post"
+      ...>       }
+      ...>     ]
+      ...>   },
+      ...>   %Alembic.Error{
+      ...>     meta: %{
+      ...>       "action" => :create,
+      ...>       "sender" => :client
+      ...>     },
+      ...>     source: %Alembic.Source{
+      ...>       pointer: ""
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :ok,
+        %Alembic.Document{
+          data: [
+            %Alembic.Resource{
+              attributes: %{
+                "text" => "First Post!"
+              },
+              id: "1",
+              relationships: %{
+                "comments" => %Alembic.Relationship{
+                  data: [
+                    %Alembic.ResourceIdentifier{
+                      id: "1",
+                      type: "comment"
+                    }
+                  ]
+                }
+              },
+              type: "post"
+            }
+          ]
+        }
+      }
 
   With `"relationships"`, a resources collection can optionally have `"included"` for the attributes for the resource
   identifiers.  If `"included"` is not given or the `"id"` and `"type"` for a resource identifier, then the resource
   identifier should just be considered a foreign key reference that needs to be fetched with another API query.
 
-     iex> Alembic.Document.from_json(
-     ...>   %{
-     ...>     "data" => [
-     ...>       %{
-     ...>         "attributes" => %{
-     ...>           "text" => "First Post!"
-     ...>         },
-     ...>         "id" => "1",
-     ...>         "relationships" => %{
-     ...>           "comments" => %{
-     ...>             "data" => [
-     ...>               %{
-     ...>                 "id" => "1",
-     ...>                 "type" => "comment"
-     ...>               }
-     ...>             ]
-     ...>           }
-     ...>         },
-     ...>         "type" => "post"
-     ...>       }
-     ...>     ],
-     ...>     "included" => [
-     ...>       %{
-     ...>         "attributes" => %{
-     ...>           "text" => "First Comment!"
-     ...>         },
-     ...>         "id" => "1",
-     ...>         "type" => "comment"
-     ...>       }
-     ...>     ]
-     ...>   },
-     ...>   %Alembic.Error{
-     ...>     meta: %{
-     ...>       "action" => :create,
-     ...>       "sender" => :client
-     ...>     },
-     ...>     source: %Alembic.Source{
-     ...>       pointer: ""
-     ...>     }
-     ...>   }
-     ...> )
-     {
-       :ok,
-       %Alembic.Document{
-         data: [
-           %Alembic.Resource{
-             attributes: %{
-               "text" => "First Post!"
-             },
-             id: "1",
-             relationships: %{
-               "comments" => %Alembic.Relationship{
-                 data: [
-                   %Alembic.ResourceIdentifier{
-                     id: "1",
-                     type: "comment"
-                   }
-                 ]
-               }
-             },
-             type: "post"
-           }
-         ],
-         included: [
-           %Alembic.Resource{
-             attributes: %{
-               "text" => "First Comment!"
-             },
-             id: "1",
-             type: "comment"
-           }
-         ]
-       }
-     }
+      iex> Alembic.Document.from_json(
+      ...>   %{
+      ...>     "data" => [
+      ...>       %{
+      ...>         "attributes" => %{
+      ...>           "text" => "First Post!"
+      ...>         },
+      ...>         "id" => "1",
+      ...>         "relationships" => %{
+      ...>           "comments" => %{
+      ...>             "data" => [
+      ...>               %{
+      ...>                 "id" => "1",
+      ...>                 "type" => "comment"
+      ...>               }
+      ...>             ]
+      ...>           }
+      ...>         },
+      ...>         "type" => "post"
+      ...>       }
+      ...>     ],
+      ...>     "included" => [
+      ...>       %{
+      ...>         "attributes" => %{
+      ...>           "text" => "First Comment!"
+      ...>         },
+      ...>         "id" => "1",
+      ...>         "type" => "comment"
+      ...>       }
+      ...>     ]
+      ...>   },
+      ...>   %Alembic.Error{
+      ...>     meta: %{
+      ...>       "action" => :create,
+      ...>       "sender" => :client
+      ...>     },
+      ...>     source: %Alembic.Source{
+      ...>       pointer: ""
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :ok,
+        %Alembic.Document{
+          data: [
+            %Alembic.Resource{
+              attributes: %{
+                "text" => "First Post!"
+              },
+              id: "1",
+              relationships: %{
+                "comments" => %Alembic.Relationship{
+                  data: [
+                    %Alembic.ResourceIdentifier{
+                      id: "1",
+                      type: "comment"
+                    }
+                  ]
+                }
+              },
+              type: "post"
+            }
+          ],
+          included: [
+            %Alembic.Resource{
+              attributes: %{
+                "text" => "First Comment!"
+              },
+              id: "1",
+              type: "comment"
+            }
+          ]
+        }
+      }
 
   #### Resource Identifiers
 
@@ -680,7 +680,9 @@ defmodule Alembic.Document do
 
   ## Incomplete documents
 
-  If neither `"errors"`, `"data"`, nor `"meta"` is present, then the document is invalid and a `Alembic.
+  If neither `"errors"`, `"data"`, nor `"meta"` is present, then the document is invalid and an `:error` tuple will be
+  returned.  In the tuple with `:error` is an `Alembic.Document.t` that is a proper JSONAPI errors document that can
+  be set back to the sender.
 
       iex> Alembic.Document.from_json(
       ...>   %{},

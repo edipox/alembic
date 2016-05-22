@@ -86,18 +86,20 @@ defmodule Alembic.FromJson do
 
   # Parameters
 
-  * `Alembic.json` - the decoded JSON from `Poison.decode/1` or some other JSON decoder.
-  * `%Alembic.Error{
-       meta: %{
-         "action" => Alembic.FromJson.action,
-         "sender" => Alembic.FromJson.sender
-       },
-       source: %Alembic.Source{
-                 parameter: nil,
-                 pointer: Alembic.json_pointer
-               }
-     }` - A prepolated error that includes a pointer for error repointing and meta information that influencing
-     validation.  For example, some formats are only accepted on `:create` or `:update` from the `:client`.
+  * `json` - the decoded JSON from `Poison.decode/1` or some other JSON decoder.
+  * `error_template` - A prepolated error that includes a pointer for error repointing and meta information that
+     influencing validation.  For example, some formats are only accepted on `:create` or `:update` from the `:client`.
+
+           %Alembic.Error{
+             meta: %{
+               "action" => Alembic.FromJson.action,
+               "sender" => Alembic.FromJson.sender
+             },
+             source: %Alembic.Source{
+               parameter: nil,
+               pointer: Alembic.json_pointer
+             }
+           }
 
   # Returns
 
@@ -111,7 +113,7 @@ defmodule Alembic.FromJson do
     `Alembic.Document.t`'s `errors`, as that `meta` information is an implementation detail and for
     internal use in recursive calls to `Alembic.FromJson.from_json/2` only.**
   """
-  @callback from_json(Alembic.json, Error.t) :: singleton_result
+  @callback from_json(decoded_json :: Alembic.json, error_template :: Error.t) :: singleton_result
 
   # Functions
 

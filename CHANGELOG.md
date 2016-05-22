@@ -16,6 +16,21 @@
 
 # Changelog
 
+## v2.0.1
+
+### Enhancements
+
+### Bug Fixes
+* [#25](https://github.com/C-S-D/alembic/pull/25) - Documentation formatting - [KronicDeth](https://github.com/KronicDeth)
+  * Wrong number of spaces and missing closing backquotes led to some doctests not being rendered correctly.
+  * Fix docs for FromJson.from_json callback
+    * Use `<name> :: <type>` format for parameters, so they don't appear as
+  `arg0` and `arg1` in the generated docs.
+    * Use those names in the Paramaters section and code block teh format of
+    the error template.
+
+### Incompatible Changes
+
 ## v2.0.0
 
 ### Enhancements

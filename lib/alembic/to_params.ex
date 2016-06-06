@@ -132,6 +132,32 @@ defmodule Alembic.ToParams do
         "text" => "Welcome to my new blog!"
       }
 
+  From the other side of the `belongs_to`, the `has_many` nested params are unchanged
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 2,
+      ...>     "name" => "Alice",
+      ...>     "posts" => [
+      ...>       %{
+      ...>         "id" => 1,
+      ...>         "text" => "Welcome to my new blog!"
+      ...>       }
+      ...>     ]
+      ...>   },
+      ...>   Alembic.TestAuthor
+      ...> )
+      %{
+        "id" => 2,
+        "name" => "Alice",
+        "posts" => [
+          %{
+            "id" => 1,
+            "text" => "Welcome to my new blog!"
+          }
+        ]
+      }
+
   """
   @spec nested_to_foreign_keys(params, module) :: params
   def nested_to_foreign_keys(nested_params, schema_module) do

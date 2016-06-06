@@ -133,27 +133,48 @@ defmodule Alembic.ToParams do
   ## Private Functions
 
   defp reduce_nested_association_params_to_foreign_keys(
-         %Ecto.Association.BelongsTo{field: field, owner_key: owner_key, related_key: related_key},
+         association = %Ecto.Association.BelongsTo{field: field},
          acc
        ) do
     param_name = to_string(field)
 
     case Map.fetch(acc, param_name) do
       {:ok, association_params} ->
-        case Map.fetch(association_params, to_string(related_key)) do
-          {:ok, foreign_key_value} ->
-            foreign_key_param_name = to_string(owner_key)
-
-            acc
-            |> Map.delete(param_name)
-            |> Map.put(foreign_key_param_name, foreign_key_value)
-          :error ->
-            acc
-        end
+        replace_nested(acc, param_name, association_params, association)
       :error ->
         acc
     end
   end
 
   defp reduce_nested_association_params_to_foreign_keys(_, acc), do: acc
+
+  defp replace_nested(params, association_param_name, nil, %Ecto.Association.BelongsTo{owner_key: owner_key}) do
+    replace_nested_with_owner(params, association_param_name, owner_key, nil)
+  end
+
+  defp replace_nested(params,
+                      association_param_name,
+                      association_params,
+                      %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}) do
+    case Map.fetch(association_params, to_string(related_key)) do
+      {:ok, foreign_key_value} ->
+        replace_nested_with_owner(params, association_param_name, owner_key, foreign_key_value)
+      :error ->
+        params
+    end
+  end
+
+  defp replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, foreign_key_value)
+        when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
+    params
+    |> Map.delete(nested_param_name)
+    |> Map.put(foreign_key_param_name, foreign_key_value)
+  end
+
+  defp replace_nested_with_owner(params, nested_param_name, owner_key, owner_key_value)
+        when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
+    foreign_key_param_name = to_string(owner_key)
+
+    replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, owner_key_value)
+  end
 end

@@ -102,6 +102,22 @@ defmodule Alembic.ToParams do
         "text" => "Welcome to my new blog!"
       }
 
+  `nil` for the nested parameters converts to a `nil` foreign key parameter
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 1,
+      ...>     "author" => nil,
+      ...>     "text" => "Welcome to my new blog!"
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %{
+        "id" => 1,
+        "author_id" => nil,
+        "text" => "Welcome to my new blog!"
+      }
+
   """
   @spec nested_to_foreign_keys(params, module) :: params
   def nested_to_foreign_keys(nested_params, schema_module) do

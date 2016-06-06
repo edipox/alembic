@@ -118,6 +118,20 @@ defmodule Alembic.ToParams do
         "text" => "Welcome to my new blog!"
       }
 
+  This differs from when the nested parameters are not even present, in which case the foreign key won't be added
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 1,
+      ...>     "text" => "Welcome to my new blog!"
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %{
+        "id" => 1,
+        "text" => "Welcome to my new blog!"
+      }
+
   """
   @spec nested_to_foreign_keys(params, module) :: params
   def nested_to_foreign_keys(nested_params, schema_module) do

@@ -102,6 +102,62 @@ defmodule Alembic.ToParams do
         "text" => "Welcome to my new blog!"
       }
 
+  `nil` for the nested parameters converts to a `nil` foreign key parameter
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 1,
+      ...>     "author" => nil,
+      ...>     "text" => "Welcome to my new blog!"
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %{
+        "id" => 1,
+        "author_id" => nil,
+        "text" => "Welcome to my new blog!"
+      }
+
+  This differs from when the nested parameters are not even present, in which case the foreign key won't be added
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 1,
+      ...>     "text" => "Welcome to my new blog!"
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %{
+        "id" => 1,
+        "text" => "Welcome to my new blog!"
+      }
+
+  From the other side of the `belongs_to`, the `has_many` nested params are unchanged
+
+      iex> Alembic.ToParams.nested_to_foreign_keys(
+      ...>   %{
+      ...>     "id" => 2,
+      ...>     "name" => "Alice",
+      ...>     "posts" => [
+      ...>       %{
+      ...>         "id" => 1,
+      ...>         "text" => "Welcome to my new blog!"
+      ...>       }
+      ...>     ]
+      ...>   },
+      ...>   Alembic.TestAuthor
+      ...> )
+      %{
+        "id" => 2,
+        "name" => "Alice",
+        "posts" => [
+          %{
+            "id" => 1,
+            "text" => "Welcome to my new blog!"
+          }
+        ]
+      }
+
   """
   @spec nested_to_foreign_keys(params, module) :: params
   def nested_to_foreign_keys(nested_params, schema_module) do
@@ -117,27 +173,48 @@ defmodule Alembic.ToParams do
   ## Private Functions
 
   defp reduce_nested_association_params_to_foreign_keys(
-         %Ecto.Association.BelongsTo{field: field, owner_key: owner_key, related_key: related_key},
+         association = %Ecto.Association.BelongsTo{field: field},
          acc
        ) do
     param_name = to_string(field)
 
     case Map.fetch(acc, param_name) do
       {:ok, association_params} ->
-        case Map.fetch(association_params, to_string(related_key)) do
-          {:ok, foreign_key_value} ->
-            foreign_key_param_name = to_string(owner_key)
-
-            acc
-            |> Map.delete(param_name)
-            |> Map.put(foreign_key_param_name, foreign_key_value)
-          :error ->
-            acc
-        end
+        replace_nested(acc, param_name, association_params, association)
       :error ->
         acc
     end
   end
 
   defp reduce_nested_association_params_to_foreign_keys(_, acc), do: acc
+
+  defp replace_nested(params, association_param_name, nil, %Ecto.Association.BelongsTo{owner_key: owner_key}) do
+    replace_nested_with_owner(params, association_param_name, owner_key, nil)
+  end
+
+  defp replace_nested(params,
+                      association_param_name,
+                      association_params,
+                      %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}) do
+    case Map.fetch(association_params, to_string(related_key)) do
+      {:ok, foreign_key_value} ->
+        replace_nested_with_owner(params, association_param_name, owner_key, foreign_key_value)
+      :error ->
+        params
+    end
+  end
+
+  defp replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, foreign_key_value)
+        when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
+    params
+    |> Map.delete(nested_param_name)
+    |> Map.put(foreign_key_param_name, foreign_key_value)
+  end
+
+  defp replace_nested_with_owner(params, nested_param_name, owner_key, owner_key_value)
+        when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
+    foreign_key_param_name = to_string(owner_key)
+
+    replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, owner_key_value)
+  end
 end

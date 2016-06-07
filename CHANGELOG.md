@@ -3,22 +3,35 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.0.0](#v200)
+  - [v2.1.0](#v210)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
+  - [v2.0.1](#v201)
+    - [Bug Fixes](#bug-fixes-1)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-1)
+    - [Bug Fixes](#bug-fixes-2)
     - [Incompatible Changes](#incompatible-changes)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-1)
-    - [Bug Fixes](#bug-fixes-1)
+    - [Enhancements](#enhancements-2)
     - [Incompatible Changes](#incompatible-changes-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
 
-## v2.0.1
+## v2.1.0
 
 ### Enhancements
+* [#27](https://github.com/C-S-D/alembic/pull/25) - Add more doctests to Alembic.ToParams.nested_to_foreign_keys - [KronicDeth](https://github.com/KronicDeth)
+  * `nil` for the nested parameters converts to a `nil` foreign key parameter
+  * When the nested parameters are not even present, the foreign key won't be added
+  *` has_many` nested params are unchanged
+
+### Bug Fixes
+* [#27](https://github.com/C-S-D/alembic/pull/25) - Convert `nil` nested params to `nil` foreign key - [KronicDeth](https://github.com/KronicDeth)
+
+## v2.0.1
 
 ### Bug Fixes
 * [#25](https://github.com/C-S-D/alembic/pull/25) - Documentation formatting - [KronicDeth](https://github.com/KronicDeth)
@@ -28,8 +41,6 @@
   `arg0` and `arg1` in the generated docs.
     * Use those names in the Paramaters section and code block teh format of
     the error template.
-
-### Incompatible Changes
 
 ## v2.0.0
 
@@ -90,6 +101,7 @@
     * `Relationships`
     * `ResourceIdentifier`
     * `ResourceLinkage`
+
 ## v1.0.0
  
 ### Enhancements
@@ -121,9 +133,6 @@
   * `Alembic.Document` can parse `from_json`, represent, and encode with `Poison.encode` all document format, including `data` and `meta`, in addition to the prior support for `errors`
   * `assert_idempotent` is defined in a module, `Alembic.FromJsonCase` under `test/support`, so it's no longer necessary to run `mix test <file> test/interpreter_server/api/from_json_test.exs` to get access to `assert_idempotent` in `<file>`.  
 
-### Bug Fixes
-
 ### Incompatible Changes
 * [#8](https://github.com/C-S-D/alembic/pull/8) - JSON API (non-errors) Documents - [KronicDeth](https://github.com/KronicDeth)
   * `Alembic.FromJsonTest.assert_idempotent` has moved to `Alembic.FromJsonCase`.
-

@@ -106,6 +106,97 @@
 						</p>
 					</aside>
 				</section>
+        <section>
+          <h1>API</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>JaSerializer</th>
+                <td><em>Your Code</em></td>
+                <td>Alembic</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>1</th>
+                <td><code>ContentTypeNegotiation</code></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>2</th>
+                <td><code>Deserializer</code></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>3</th>
+                <td></td>
+                <td><em>action</em></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th>4</th>
+                <td></td>
+                <td></td>
+                <td><code>Document.from_json</code></td>
+              </tr>
+              <tr>
+                <th>5</th>
+                <td></td>
+                <td></td>
+                <td><code>Document.to_params</code></td>
+              </tr>
+              <tr>
+                <th>6</th>
+                <td></td>
+                <td></td>
+                <td><code>ToParams.nested_to_foreign_keys</code></td>
+              </tr>
+              <tr>
+                <th>7</th>
+                <td></td>
+                <td></td>
+                <td><code>Fetch.from_params</code></td>
+              </tr>
+              <tr>
+                <th>8</th>
+                <td></td>
+                <td></td>
+                <td><code>Fetch.Includes.to_preloads</code></td>
+              </tr>
+              <tr>
+                <th>9</th>
+                <td><code>PhoenixView</code></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <aside class="notes">
+            <p>
+              When I announced the release of Alembic, there were multiple people wondering how it compared to
+              JaSerializer, but for Vineya, we use JaSerializer with Alembic.  We use JaSerializer's plugs to deal with
+              the content-type and accept headers and to convert from JSONAPI's hyphenated keys to the underscored
+              keys used by Ecto.  Once inside each action, we use Alembic to (4) validate that the params are valid
+              JSONAPI document; (5 & 6) convert to the params format used by Ecto.Changeset; and (8) to convert included
+              relationships to association preloads before using JaSerializer again to render the view.
+            </p>
+            <p>
+              When I started at CSD in November 2015, JaSerializer did not have Params.to_attributes, which was only
+              added in April 2016, so params arrived at the Phoenix.Controller action, but there was no validation that
+              the params were even structured as a proper JSONAPI document.  We could manually pick out the data
+              attributes and relationships that were needed for each controller and action, but that didn't seem right
+              to me.  My understanding of the purpose of JSONAPI was to make the encoding and decoding of resources
+              more regular, so the code for any action across all controllers for JSONAPI resources should be the same.
+              Furthermore, the JSONAPI spec outlines a format for errors and when they should be returned, so I knew
+              that the error handling should be extractable to its own library, so it could get out of the business
+              logic of each action.
+            </p>
+          </aside>
+        </section>
+
 			</div>
 		</div>
 

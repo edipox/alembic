@@ -292,8 +292,10 @@
           <section>
             <h1>Relationships and Includes</h1>
             <div class="stretch">
-              <img class="snippet" src="images/document-from-json/data/relationships-and-includes/call.png" width="48%"/>
-              <img class="snippet" src="images/document-from-json/data/relationships-and-includes/return.png" width="48%"/>
+              <img class="snippet" src="images/document-from-json/data/relationships-and-includes/call.png"
+                   width="48%"/>
+              <img class="snippet" src="images/document-from-json/data/relationships-and-includes/return.png"
+                   width="48%"/>
             </div>
             <aside class="notes">
               <p>
@@ -308,6 +310,110 @@
               <p>
                 Notice how most containers are structs with atom keys, but the relationships of a Resource is a map
                 with string keys because the names are not predefined by the JSONAPI spec.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1>Errors</h1>
+            <div class="stretch">
+              <img class="snippet" src="images/document-from-json/incomplete/call.png" width="48%"/>
+              <img class="snippet" src="images/document-from-json/incomplete/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                Ok, that's great, Alembic can parse JSON into structs, but that doesn't buy us much. What we want is
+                for Alembic to automatically handle error reporting, so if the json is not a valid JSONAPI document,
+                instead of returning <code>{:ok, Document.t}</code>, Alembic will return
+                <code>{:error, Document.t}</code>
+              </p>
+              <p>
+                If there's an error, how can Alembic return a Document still? It's not a partial Document containing
+                only the valid parts of the JSON, but instead a JSONAPI error document that can be re-encoded and sent
+                back to the sender.
+              </p>
+              <p>
+                The format of detail and meta isn't that specific in the JSONAPI spec, but in general Alembic tries to
+                include machine parsable presentations of anything from details in meta, so that you can construct your
+                own error messages if you don't like the detail message.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1>Nested Errors</h1>
+            <div class="stretch">
+              <img class="snippet" src="images/document-from-json/errors/error/call.png" width="48%">
+              <img class="snippet" src="images/document-from-json/errors/error/return.png" width="48%">
+            </div>
+            <aside class="notes">
+              <p>
+                Alembic doesn't just detect errors in the top-level keys of the JSONAPI document, but in all the nested
+                JSON objects that are defined by the spec.
+              </p>
+              <p>
+                When an error is found in a nested part of the Document, the source pointer shows which element has
+                the error. The source pointer is a JSON Pointer, defined in RFC 6901.
+              </p>
+            </aside>
+          </section>
+        </section>
+        <section class="stack">
+          <section>
+            <h1>FromJson.from_json</h1>
+            <div class="stretch">
+              <img class="snippet" src="images/from-json/from-json/callback.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                Alembic can generate the nested JSON pointers due from_json being a behaviour callback in
+                Alembic.FromJson.
+              </p>
+              <p>
+                All the nested JSON objects in documents have modules (Error, Link, Links, Meta, Relationship,
+                Relationships, Resource, ResourceIdentifier, ResourceLinkage, and Source) that implement the FromJson
+                behavior.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1><code>Error.descend</code></h1>
+            <div class="stretch">
+              <img class="snippet" src="images/error/descend/call.png" width="48%">
+              <img class="snippet" src="images/error/descend/return.png" width="48%">
+            </div>
+            <aside class="notes">
+              <p>
+                Because each nested JSON object has a module, converting json to an Alembic.Document struct is a matter
+                of each level converting its children by passing an error template with that child's source pointer.
+              </p>
+              <p>
+                The child's error template is made using Error.descend
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1><code>FromJson.merge</code></h1>
+            <div class="stretch">
+              <img class="snippet" src="images/from-json/merge/call.png" width="48%"/>
+              <img class="snippet" src="images/from-json/merge/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                The final piece of the error handling is being able to report multiple errors instead of just the first
+                error. This isn't required by the JSONAPI spec, it says "A server MAY choose to stop processing as soon
+                as a problem is encountered, or it MAY continue processing and encounter multiple problems", but I
+                wanted all errors in one request to be available, so users don't need multiple round trips to fix
+                errors.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1><code>FromJson.reduce</code></h1>
+            <div class="stretch">
+              <img class="snippet" src="images/from-json/reduce/call.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                FromJson.reduce is the enumerable version of FromJson.merge
               </p>
             </aside>
           </section>

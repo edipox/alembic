@@ -418,9 +418,169 @@
             </aside>
           </section>
         </section>
+        <section class="stack">
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/create.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                So, how do we use this nice error handling in our controllers? After JaSerializer.Deserializer has
+                converted the hyphenated params to underscores, the action gets the params, and uses those as the json
+                for Document.from_json.
+              </p>
+              <p>
+                In our InterpreterServer app for Vineya, I've made a module, InterpreterServer.Controller.Ecto, that has
+                common actions for each of the REST actions required by JSONAPI, so for the create action, it calls
+                IntepreterServer.Controller.Ecto.create.
+              </p>
+              <p>
+                The general structure of the controller functions uses a happy path <code>with</code> in action
+                function and then the sad path is handled by each method being called generating the error response.
+                This effectively works like halting the Plug.Conn, but I don't have to setup guard clauses at the top
+                of the controller to have plugs used for only one action.
+              </p>
+              <p>
+                <code>valid_create_changeset</code> and <code>preloads_from_include_param</code> both use Alembic, so
+                we'll focus on those functions.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/valid-create-changeset.png"
+                   width="100%"/>
+              <img class="snippet" src="images/interpreter-server/controller/ecto/create-changeset.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                <code>valid_create_changeset</code> calls <code>create_changeset</code> and
+                <code>create_changeset</code> calls <code>document_from_json</code>.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/document-from-json.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                <code>document_from_json</code> calls Alembic.Document.from_json with the action name and using the
+                <code>with</code> to handle the sad path of rendering the error.
+              </p>
+              <p>
+                <code>document_from_json</code> is only called for <code>create</code> and <code>update</code> actions,
+                which match the names used in the JSONAPI spec, but there are other actions that don't match exactly.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/from-json/action.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                The JSONAPI spec doesn't differentiate the action for index or show and instead calls that fetch.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/create-changeset.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When <code>document_from_json</code> doesn't encounter an error, <code>create_changeset</code>'s
+                <code>with</code> passes the Document to Document.to_params and then ensures <code>belongs_to</code>
+                associations will insert correctly using ToParams.nested_to_foreign_keys.
+              </p>
+            </aside>
+          </section>
+        </section>
+        <section class="stack">
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/document/to-params.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                JSONAPI Document is at most two levels deep: The Resource(s) in data and then any direct or indirect
+                relationships are grouped together in <code>included</code>, but the nested params format has no fixed
+                depth, so <code>to_params</code> needs to pass a lookup table keyed by <code>type</code> and
+                <code>id</code>.
+              </p>
+              <p>
+                However, the lookup table wasn't enough because the JSONAPI allows ResourceIdentifiers, or effectively
+                pointers, AND it represents <code>has_one</code> and <code>belongs_to</code> associations the same
+                way: as to-one relationships, so when both the Resource with the <code>belongs_to</code> association
+                and the related resource with the <code>has_one</code> are included in a JSONAPI document, you get
+                circular references in in the ResourceIdentifiers in the relationships.
+                <code>converted_by_id_by_type</code> prevents the circular references from leading to infinite
+                recursion by tracking the <code>{type, id}</code> pairs that have already been converted from
+                JSONAPI to nested params.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/to-params/to-params-3.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                If a <code>type</code> and <code>id</code> have already been seen, the conversion can't return nothing
+                because that would make it looks like the nested association is <code>nil</code>, so instead, if the
+                <code>type</code> and <code>id</code> is in <code>converted_by_id_by_type</code>, just the primary
+                key is included.
+              </p>
+            </aside>
+          </section>
+        </section>
+        <section class="stack">
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/create-changeset.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                The <code>ToParams.to_params</code> behaviour only nests params, it does not transform nested params
+                to the format needed for Ecto.Changeset.cast because <code>to_params</code> is not passed the
+                Ecto.Schema modules.  This is a deliberate design choice, so that the behaviour doesn't have a
+                dependency on Ecto and it allows to reduce the number of arguments passed down to the child
+                <code>to_params</code> calls.
+              </p>
+              <p>
+                So, once Document.to_params returns the nested params, along with the primary Ecto.Schema module is
+                passed to ToParams.nested_to_foreign_keys.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/to-params/nested-to-foreign-keys/present/call.png" width="48%"/>
+              <img class="snippet" src="images/to-params/nested-to-foreign-keys/present/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When <code>nested_to_foreign_keys</code> converts a nested primary key to a foreign key, it removes
+                the nested params from the returned map.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/to-params/nested-to-foreign-keys/nil/call.png" width="48%"/>
+              <img class="snippet" src="images/to-params/nested-to-foreign-keys/nil/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When the nested params are <code>nil</code>, the foreign key has to be set to <code>nil</code> to
+                distinguish the case where it was just not included.
+              </p>
+            </aside>
+          </section>
+        </section>
       </div>
     </div>
-
     <script src="lib/js/head.min.js"></script>
     <script src="js/reveal.js"></script>
 

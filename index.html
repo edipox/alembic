@@ -544,7 +544,7 @@
               <p>
                 The <code>ToParams.to_params</code> behaviour only nests params, it does not transform nested params
                 to the format needed for Ecto.Changeset.cast because <code>to_params</code> is not passed the
-                Ecto.Schema modules.  This is a deliberate design choice, so that the behaviour doesn't have a
+                Ecto.Schema modules. This is a deliberate design choice, so that the behaviour doesn't have a
                 dependency on Ecto and it allows to reduce the number of arguments passed down to the child
                 <code>to_params</code> calls.
               </p>
@@ -575,6 +575,129 @@
               <p>
                 When the nested params are <code>nil</code>, the foreign key has to be set to <code>nil</code> to
                 distinguish the case where it was just not included.
+              </p>
+            </aside>
+          </section>
+        </section>
+        <section class="stack">
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/create.png" width="100%">
+            </div>
+            <aside class="notes">
+              <p>
+                We have a Changeset for create, but once created, we may want to return some associations as included
+                relationships.
+              </p>
+              <p>
+                I call <code>preloads_from_include_param</code> before calling <code>mutate_repo</code> because
+                the preloads could be malformed and I don't want errors in the input preventing me from rendering a
+                proper response after I've changed the Repo because that could lead the caller to believe the Repo
+                did not change when it did.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/controller/ecto/preloads-from-include-param.png"
+                   width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                <code>Fetch.from_params</code> can't error out because there is no validation on the include parameter:
+                the allowed relationships aren't checked until <code>Fetch.to_query</code>.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/fetch/to-query/error/call.png" width="48%"/>
+              <img class="snippet" src="images/fetch/to-query/error/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                If a relationship path, here <code>"secret"</code> isn't mapped to <code>preloads</code>, then an error
+                is returned, so that callers don't have wonder why resources aren't being included. This can be very
+                important when you explicitly decide not to include an association in the list of includable
+                relationships.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <h1>API</h1>
+            <table>
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th>JaSerializer</th>
+                  <td><em>Your Code</em></td>
+                  <td>Alembic</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>1</th>
+                  <td><code>ContentTypeNegotiation</code></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td><code>Deserializer</code></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td></td>
+                  <td><em>action</em></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>4</th>
+                  <td></td>
+                  <td></td>
+                  <td><code>Document.from_json</code></td>
+                </tr>
+                <tr>
+                  <th>5</th>
+                  <td></td>
+                  <td></td>
+                  <td><code>Document.to_params</code></td>
+                </tr>
+                <tr>
+                  <th>6</th>
+                  <td></td>
+                  <td></td>
+                  <td><code>ToParams.nested_to_foreign_keys</code></td>
+                </tr>
+                <tr>
+                  <th>7</th>
+                  <td></td>
+                  <td></td>
+                  <td><code>Fetch.from_params</code></td>
+                </tr>
+                <tr>
+                  <th>8</th>
+                  <td></td>
+                  <td></td>
+                  <td><code>Fetch.Includes.to_preloads</code></td>
+                </tr>
+                <tr>
+                  <th>9</th>
+                  <td><code>PhoenixView</code></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+            <aside class="notes">
+              <p>
+                With a valid changeset and preloads, we can change the database, knowing that we'll be able to
+                render the response in the format requested by the caller.
+              </p>
+              <p>
+                The last step is rendering with a JaSerializer.PhoenixView.
               </p>
             </aside>
           </section>

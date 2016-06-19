@@ -258,7 +258,8 @@
           </section>
           <section>
             <h1>Present Single Resource Identifier</h1>
-            <img class="snippet" src="images/alembic/document/from-json/data/single/resource-identifier/call.png" width="48%"/>
+            <img class="snippet" src="images/alembic/document/from-json/data/single/resource-identifier/call.png"
+                 width="48%"/>
             <img class="snippet" src="images/alembic/document/from-json/data/single/resource-identifier/return.png"
                  width="48%"/>
             <aside class="notes">
@@ -276,8 +277,10 @@
           <section>
             <h1>Present Collection</h1>
             <div class="stretch">
-              <img class="snippet" src="images/alembic/document/from-json/data/collection/resources/call.png" width="48%"/>
-              <img class="snippet" src="images/alembic/document/from-json/data/collection/resources/return.png" width="48%"/>
+              <img class="snippet" src="images/alembic/document/from-json/data/collection/resources/call.png"
+                   width="48%"/>
+              <img class="snippet" src="images/alembic/document/from-json/data/collection/resources/return.png"
+                   width="48%"/>
             </div>
             <aside class="notes">
               <p>
@@ -557,7 +560,8 @@
           <section>
             <div class="stretch">
               <img class="snippet" src="images/alembic/to-params/nested-to-foreign-keys/present/call.png" width="48%"/>
-              <img class="snippet" src="images/alembic/to-params/nested-to-foreign-keys/present/return.png" width="48%"/>
+              <img class="snippet" src="images/alembic/to-params/nested-to-foreign-keys/present/return.png"
+                   width="48%"/>
             </div>
             <aside class="notes">
               <p>
@@ -701,6 +705,214 @@
               </p>
             </aside>
           </section>
+        </section>
+        <section class="stack">
+          <section>
+            <h1>Client</h1>
+            <table>
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <td>Alembic</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <aside class="notes">
+              <p>
+                So far, I've shown Alembic working as the server, but Alembic can also be used in a client.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/rpc/client/generic/result-to-document.png"
+                   width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                In addition to using Alembic for our controllers that interface with Ember, we put JSONAPI inside
+                of JSONRPC and use that to communicate with Ruby applications over RabbitMQ. Our Elixir application
+                has both RPC servers for the resources it owns and RPC clients to getting resources that the Ruby
+                applications own.
+              </p>
+              <p>
+                When the JSONRPC response comes back, it has a result field, that field is the <code>result</code>
+                argument to <code>result_to_document</code>.
+              </p>
+              <p>
+                <code>Api.deserialize_keys</code> does the same as JaSerializer.Deserializer, but isn't dependent on
+                the argument being a Plug.Conn.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/api/deserialize-keys.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                Internally, <code>Api.deserialize_keys</code> uses the same formatting functions as
+                JaSerialier.Deserializer: <code>JaSerializer.ParamParser.Utils.format_keys</code>
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/interpreter-server/rpc/client/generic/reply.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                <code>result_to_document</code>'s Document is used in <code>reply</code>, which formats the GenServer
+                reply.
+              </p>
+              <p>
+                As part of that formatting, I wanted the RPC client to return a nested Ecto.Schema struct that would
+                look just like the return from Ecto.Repo calls, so Document.to_ecto_schema does that conversion.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/nil/call.png" width="48%"/>
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/nil/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When there is <code>nil</code> data in JSONAPI, it becomes <code>nil</code> for the Ecto.Schema struct.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/single/call.png" width="48%"/>
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/single/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When there is a single Resource in "data", it becomes an Ecto.Schema struct corresponding to that type
+                using the ecto_schema_by_type map passed to <code>to_ecto_schema</code>.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/relationship/call.png" width="48%"/>
+              <img class="snippet" src="images/alembic/document/to-ecto-schema/relationship/return.png" width="48%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                When there are relationships, they get attached to the struct using the associations.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <table>
+              <thead>
+                <tr>
+                  <th>JSONAPI</th>
+                  <th>Ecto.Schema</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>attributes</td>
+                  <td>fields</td>
+                </tr>
+                <tr>
+                  <td>relationships</td>
+                  <td>associations</td>
+                </tr>
+              </tbody>
+            </table>
+            <aside class="notes">
+              <p>
+                This may seem like I'm overly tying the relationships to the associations, but none of this code
+                cares that an Ecto.Repo exists. The Ecto.Schema modules are only used as a convenient way to
+                declare the casting rules for the attributes and relationships, mapping JSONAPI Resource attributes to
+                Ecto.Schema fields and relationships to associations. The Ecto.Schema modules don't have to be backed
+                by a database table and aren't for our usage of RPC clients.
+              </p>
+              <p>
+                It so happens that for our API controllers, the Ecto.Schema module used to cast the JSONAPI to structs
+                is the same as the database table, but that doesn't have to be the case and is only that way because
+                none of our JSONAPI resources are composite views of database tables.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/alembic/to-ecto-schema/to-ecto-schema.png" width="100%"/>
+              <img class="snippet" src="images/alembic/to-ecto-schema/put-named-association.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                Document.to_ecto_schema eventually calls ToEctoSchema.to_ecto_schema, which uses Ecto.Changeset.cast
+                to apply the casting rules defined by the Ecto.Schema module <code>field</code>s. It does not use
+                changeset, because for the use case of a Client, there is no validation of the attribute and
+                associations because whatever the Server sent is the truth.
+              </p>
+              <p>
+                Because <code>to_ecto_schema</code> uses only <code>cast</code> and <code>__schema__</code>, which
+                are available to any module <code>us</code>ing Ecto.Schema's schema DSL, there's no new DSLs needed to
+                use an Ecto.Schema module for to_ecto_schema.
+              </p>
+              <p>
+                The <code>to_string</code> in <code>put_named_association</code> is the code that cements that
+                relationship name (after prior reformatting from hyphenated to underscored) match association names.
+                If one wanted to make them different, the <code>to_string</code> could be changed to a transformation
+                function that is passed in. PRs welcome.
+              </p>
+            </aside>
+          </section>
+          <section>
+            <div class="stretch">
+              <img class="snippet" src="images/alembic/to-ecto-schema/put-association.png" width="100%"/>
+            </div>
+            <aside class="notes">
+              <p>
+                <code>put_association</code> handles the differences between different types of associations and starts
+                recursively handling indirect relationships by calling <code>to_ecto_schema</code> on each of the
+                associated params.
+              </p>
+            </aside>
+          </section>
+        </section>
+        <section>
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Client</th>
+                <th>Server</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>API</th>
+                <td>&#10003;</td>
+                <td>&#10003;</td>
+              </tr>
+              <tr>
+                <th>RPC</th>
+                <td>&#10003;</td>
+                <td>&#10003;</td>
+              </tr>
+            </tbody>
+          </table>
+          <aside class="notes">
+            <p>
+              With the available conversion functions provided by Alembic, we are able to use it for clients and servers
+              and for API and RPC. It can work with Plugs, such as those from JaSerializer, but does not require a
+              Plug.Conn to be avalable. It leaves the casting and associations of Ecto, without the need for
+              access to a database through an Ecto.Repo.
+            </p>
+          </aside>
         </section>
       </div>
     </div>

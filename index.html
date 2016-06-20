@@ -104,8 +104,8 @@
               I am a Senior Software Engineer at Communication Service for the Deaf (CSD). CSD is fully
               remote for the development team and most of the non-profit outside the call centers. I work
               on Vineya, a market place and SaaS to allow the Deaf community to select their own American
-              Sign Language (ASL) interpreter. The current, market place only version of Vineya is a Ruby
-              application that was developed by I joining CSD. The SaaS version, under development,
+              Sign Language (ASL) interpreter. The current, market-place-only version of Vineya is a Ruby
+              application that was developed before I joined CSD. The SaaS version, under development,
               is a mix of Ruby applications and Elixir applications.
             </p>
             <p>
@@ -507,7 +507,7 @@
             </div>
             <aside class="notes">
               <p>
-                JSONAPI Document is at most two levels deep: The Resource(s) in data and then any direct or indirect
+                A JSONAPI Document is at most two levels deep: The Resource(s) in data and then any direct or indirect
                 relationships are grouped together in <code>included</code>, but the nested params format has no fixed
                 depth, so <code>to_params</code> needs to pass a lookup table keyed by <code>type</code> and
                 <code>id</code>.
@@ -517,7 +517,7 @@
                 pointers, AND it represents <code>has_one</code> and <code>belongs_to</code> associations the same
                 way: as to-one relationships, so when both the Resource with the <code>belongs_to</code> association
                 and the related resource with the <code>has_one</code> are included in a JSONAPI document, you get
-                circular references in in the ResourceIdentifiers in the relationships.
+                circular references in the ResourceIdentifiers in the relationships.
                 <code>converted_by_id_by_type</code> prevents the circular references from leading to infinite
                 recursion by tracking the <code>{type, id}</code> pairs that have already been converted from
                 JSONAPI to nested params.
@@ -596,7 +596,7 @@
               <p>
                 I call <code>preloads_from_include_param</code> before calling <code>mutate_repo</code> because
                 the preloads could be malformed and I don't want errors in the input preventing me from rendering a
-                proper response after I've changed the Repo because that could lead the caller to believe the Repo
+                proper response after I've changed the Repo because that could lead the caller believing the Repo
                 did not change when it did.
               </p>
             </aside>
@@ -724,11 +724,11 @@
               <p>
                 In addition to using Alembic for our controllers that interface with Ember, we put JSONAPI inside
                 of JSONRPC and use that to communicate with Ruby applications over RabbitMQ. Our Elixir application
-                has both RPC servers for the resources it owns and RPC clients to getting resources that the Ruby
+                has both RPC servers for the resources it owns and RPC clients for getting resources that the Ruby
                 applications own.
               </p>
               <p>
-                When the JSONRPC response comes back, it has a result field, that field is the <code>result</code>
+                When the JSONRPC response comes back, it has a result field. That field is the <code>result</code>
                 argument to <code>result_to_document</code>.
               </p>
               <p>
@@ -850,9 +850,9 @@
               </p>
               <p>
                 The <code>to_string</code> in <code>put_named_association</code> is the code that cements that
-                relationship name (after prior reformatting from hyphenated to underscored) match association names.
-                If one wanted to make them different, the <code>to_string</code> could be changed to a transformation
-                function that is passed in. PRs welcome.
+                relationship names (after prior reformatting from hyphenated to underscored) must match association
+                names. If one wanted to make them different, the <code>to_string</code> could be changed to a
+                transformation function that is passed in. PRs welcome.
               </p>
             </aside>
           </section>
@@ -895,10 +895,13 @@
             <p>
               With the available conversion functions provided by Alembic, we are able to use it for clients and servers
               and for API and RPC. It can work with Plugs, such as those from JaSerializer, but does not require a
-              Plug.Conn to be avalable. It leaves the casting and associations of Ecto, without the need for
+              Plug.Conn to be avalable. It leaves the casting and associations to Ecto, without the need for
               access to a database through an Ecto.Repo.
             </p>
           </aside>
+        </section>
+        <section>
+          <h1>Questions?</h1>
         </section>
       </div>
     </div>

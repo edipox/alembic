@@ -235,6 +235,8 @@ defmodule Alembic.Source do
   end
 
   defimpl Poison.Encoder do
+    alias Alembic.Source
+
     @doc """
     Encoded `Alembic.Source.t` as a `String.t` contain a JSON object with either a `"parameter"` or `"pointer"` member.
     Whichever field is `nil` in the `Alembic.Source.t` does not appear in the output.
@@ -258,7 +260,8 @@ defmodule Alembic.Source do
         {:ok, "{\\"pointer\\":\\"/data\\"}"}
 
     """
-    @spec encode(@for.t, Keyword.t) :: String.t
+    # work-around https://github.com/elixir-lang/elixir/issues/4874
+    @spec encode(Source.t, Keyword.t) :: String.t
 
     def encode(%@for{parameter: parameter, pointer: nil}, options) when is_binary(parameter) do
       Poison.Encoder.Map.encode(%{"parameter" => parameter}, options)

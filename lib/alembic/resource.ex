@@ -7,7 +7,6 @@ defmodule Alembic.Resource do
 
   defstruct attributes: nil,
             id: nil,
-            relationships: nil,
             type: nil
 
   # Types
@@ -26,7 +25,6 @@ defmodule Alembic.Resource do
   @type t :: %__MODULE__{
                attributes: Alembic.json_object | nil,
                id: id | nil,
-               relationships: map | nil,
                type: type
              }
 
@@ -38,7 +36,7 @@ defmodule Alembic.Resource do
   @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
   def to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
 
-  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: _, type: type},
+  def to_params(%__MODULE__{attributes: attributes, id: id, type: type},
                 resource_by_id_by_type,
                 converted_by_id_by_type) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
     case get_in(converted_by_id_by_type, [type, id]) do

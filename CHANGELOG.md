@@ -20,6 +20,13 @@
 
 # Changelog
 
+## v2.1.1
+
+### Bug Fixes
+* [#30](https://github.com/C-S-D/alembic/pull/30) - Elixir 1.3.0 compatibility - [KronicDeth](https://github.com/KronicDeth)
+  - Work-around [elixir-lang/elixir#4874)](https://github.com/elixir-lang/elixir/issues/4874) by aliasing `Alembic.Source` and using `Source.t` instead of `@for.t`.
+  - Use Erlang 18.3 instead of Erlang 19.0 until dialyer bug (http://bugs.erlang.org/browse/ERL-177) is fixed.
+
 ## v2.1.0
 
 ### Enhancements

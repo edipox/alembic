@@ -13,14 +13,9 @@ defmodule Alembic.Resource do
 
   # Functions
 
-  @spec to_params(t, map) :: map
-  def to_params(resource, resource_by_id_by_type), do: to_params(resource, resource_by_id_by_type, %{})
+  @spec to_map(t) :: map
+  def to_map(resource), do: to_map(resource, %{})
 
-  @spec to_params(t, map, map) :: map
-
-  def to_params(_,
-                resource_by_id_by_type,
-                converted_by_id_by_type) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
-    %{}
-  end
+  @spec to_map(t, map) :: map
+  def to_map(_, map) when is_map(map), do: %{}
 end

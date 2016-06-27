@@ -42,7 +42,7 @@ defmodule Alembic.Mixfile do
   defp deps do
     [
       # static code analysis for style and consistency
-      {:credo, "~> 0.3.13", only: [:dev, :test]},
+      {:credo, "~> 0.4.5", only: [:dev, :test]},
       # test coverge tool.  Allow `--cover` option for `mix test`
       {:coverex, "~> 1.4", only: :test},
       # success type checker: ensures @type and @spec are valid

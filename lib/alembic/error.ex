@@ -5,14 +5,9 @@ defmodule Alembic.Error do
   JSON API document.
   """
 
-  alias Alembic.FromJson
   alias Alembic.Links
   alias Alembic.Meta
   alias Alembic.Source
-
-  # Behaviours
-
-  @behaviour FromJson
 
   # Constants
 
@@ -157,72 +152,6 @@ defmodule Alembic.Error do
   @spec descend(t, String.t | integer) :: t
   def descend(error = %__MODULE__{source: source}, child) do
     %__MODULE__{error | source: Source.descend(source, child)}
-  end
-
-  @doc """
-  Converts a JSON object into a JSON API Error, `t`.
-
-      iex> Alembic.Error.from_json(
-      ...>   %{
-      ...>     "code" => "1",
-      ...>     "detail" => "There was an error in data",
-      ...>     "id" => "2",
-      ...>     "links" => %{
-      ...>       "about" => %{
-      ...>         "href" => "/errors/2",
-      ...>         "meta" => %{
-      ...>           "extra" => "about meta"
-      ...>         }
-      ...>       }
-      ...>     },
-      ...>     "meta" => %{
-      ...>       "extra" => "error meta"
-      ...>     },
-      ...>     "source" => %{
-      ...>       "pointer" => "/data"
-      ...>     },
-      ...>     "status" => "422",
-      ...>     "title" => "There was an error"
-      ...>   },
-      ...>   %Alembic.Error{
-      ...>     source: %Alembic.Source{
-      ...>       pointer: "/errors/0"
-      ...>     }
-      ...>   }
-      ...> )
-      {
-        :ok,
-        %Alembic.Error{
-          code: "1",
-          detail: "There was an error in data",
-          id: "2",
-          links: %{
-            "about" => %Alembic.Link{
-              href: "/errors/2",
-              meta: %{
-                "extra" => "about meta"
-              }
-            }
-          },
-          meta: %{
-            "extra" => "error meta"
-          },
-          source: %Alembic.Source{
-            pointer: "/data"
-          },
-          status: "422",
-          title: "There was an error"
-        }
-      }
-
-  """
-  def from_json(json_object = %{}, template = %__MODULE__{}) do
-    parent = %{json: json_object, error_template: template}
-
-    @child_options_list
-    |> Stream.map(&Map.put(&1, :parent, parent))
-    |> Stream.map(&FromJson.from_parent_json_to_field_result/1)
-    |> FromJson.reduce({:ok, %__MODULE__{}})
   end
 
   @doc """

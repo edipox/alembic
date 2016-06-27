@@ -4,7 +4,6 @@ defmodule Alembic.Document do
   """
 
   alias Alembic.Resource
-  alias Alembic.ResourceLinkage
   alias Alembic.ToParams
 
   # Behaviours
@@ -12,14 +11,6 @@ defmodule Alembic.Document do
   @behaviour ToParams
 
   # Constants
-
-  @data_options %{
-                  field: :data,
-                  member: %{
-                    module: ResourceLinkage,
-                    name: "data"
-                  }
-                }
 
   @errors_options %{
                     field: :errors,
@@ -38,14 +29,6 @@ defmodule Alembic.Document do
   @human_type "document"
 
   @minimum_children ~w{data errors meta}
-
-  # DOES NOT include `@errors_options` because `&FromJson.from_json_array(&1, &2, Error)` cannot appear in a module
-  #   attribute used in a function
-  # DOES NOT include `@included_options` because `&FromJson.from_json_array(&1, &2, Resource)` cannot appear in a module
-  #   attribute used in a function
-  @child_options_list [
-    @data_options
-  ]
 
   # Struct
 

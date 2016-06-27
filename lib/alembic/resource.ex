@@ -1,10 +1,7 @@
 defmodule Alembic.Resource do
   # Types
 
-  @type t :: %{
-               __struct__: Alembic.Resource,
-               type: String.t
-             }
+  @type t :: %{type: String.t}
 
   # Functions
 

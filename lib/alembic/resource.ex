@@ -102,7 +102,7 @@ defmodule Alembic.Resource do
 
   * `attributes` - an [attributes object](http://jsonapi.org/format/#document-resource-object-attributes) representing
     some of the resource's data.
-  * `links` - an `Alembic.Link.links` containing links related to the resource.
+  * `links` - a `String.t` or `map` containing links related to the resource.
   * `meta` - contains non-standard meta-information about a resource that can not be represented as an attribute or
     relationship.
   * `relationships` - a [relationships object](http://jsonapi.org/format/#document-resource-object-relationships)

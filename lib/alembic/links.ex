@@ -8,8 +8,6 @@ defmodule Alembic.Links do
   > </cite>
   """
 
-  alias Alembic.Link
-
   # Constants
 
   @human_type "links object"
@@ -23,7 +21,7 @@ defmodule Alembic.Links do
   # Types
 
   @typedoc """
-  Maps `String.t` name to `Alembic.Link.link`
+  Maps `String.t` name to a `String.t` or `map`
   """
-  @type t :: %{String.t => Link.link}
+  @type t :: %{String.t => String.t | map}
 end

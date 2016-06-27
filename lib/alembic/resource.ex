@@ -1,13 +1,10 @@
 defmodule Alembic.Resource do
-  # Struct
-
-  defstruct type: nil
-
   # Types
 
   @type type :: String.t
 
-  @type t :: %__MODULE__{
+  @type t :: %{
+               __struct__: Alembic.Resource,
                type: type
              }
 

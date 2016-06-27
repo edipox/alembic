@@ -214,37 +214,4 @@ defmodule Alembic.Resource do
         Map.merge(params, relationships_params)
     end
   end
-
-  # Protocol Implementations
-
-  defimpl Poison.Encoder do
-    alias Alembic.Resource
-
-    @doc """
-    Only non-`nil` members are encoded
-
-        iex> Poison.encode(
-        ...>   %Alembic.Resource{
-        ...>     type: "post"
-        ...>   }
-        ...> )
-        {:ok, "{\\"type\\":\\"post\\"}"}
-
-    But, `type` is always required, so without it, an exception is raised.
-
-        iex> try do
-        ...>   Poison.encode(%Alembic.Resource{})
-        ...> rescue
-        ...>   e in FunctionClauseError -> e
-        ...> end
-        %FunctionClauseError{arity: 2, function: :encode, module: Poison.Encoder.Alembic.Resource}
-
-    """
-    def encode(resource = %Resource{type: type}, options) when not is_nil(type) do
-      # strip `nil` so that resources without id for create don't end up with `"id": null` after encoding
-      map = for {field, value} <- Map.from_struct(resource), value != nil, into: %{}, do: {field, value}
-
-      Poison.Encoder.Map.encode(map, options)
-    end
-  end
 end

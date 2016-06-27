@@ -49,42 +49,4 @@ defmodule Alembic.Source do
   def descend(source = %__MODULE__{pointer: pointer}, child) do
     %__MODULE__{source | pointer: "#{pointer}/#{child}"}
   end
-
-  defimpl Poison.Encoder do
-    alias Alembic.Source
-
-    @doc """
-    Encoded `Alembic.Source.t` as a `String.t` contain a JSON object with either a `"parameter"` or `"pointer"` member.
-    Whichever field is `nil` in the `Alembic.Source.t` does not appear in the output.
-
-    If `parameter` is set in the `Alembic.Source.t`, then the encoded JSON will only have "parameter"
-
-        iex> Poison.encode(
-        ...>   %Alembic.Source{
-        ...>     parameter: "q"
-        ...>   }
-        ...> )
-        {:ok, "{\\"parameter\\":\\"q\\"}"}
-
-    If `pointer` is set in the `Alembic.Source.t`, then the encoded JSON will only have "pointer"
-
-        iex> Poison.encode(
-        ...>   %Alembic.Source{
-        ...>     pointer: "/data"
-        ...>   }
-        ...> )
-        {:ok, "{\\"pointer\\":\\"/data\\"}"}
-
-    """
-    # work-around https://github.com/elixir-lang/elixir/issues/4874
-    @spec encode(Source.t, Keyword.t) :: String.t
-
-    def encode(%@for{parameter: parameter, pointer: nil}, options) when is_binary(parameter) do
-      Poison.Encoder.Map.encode(%{"parameter" => parameter}, options)
-    end
-
-    def encode(%@for{parameter: nil, pointer: pointer}, options) when is_binary(pointer) do
-      Poison.Encoder.Map.encode(%{"pointer" => pointer}, options)
-    end
-  end
 end

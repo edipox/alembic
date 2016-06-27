@@ -5,7 +5,6 @@ defmodule Alembic.Resource do
   [resources](http://jsonapi.org/format/#document-resource-objects) as are the members of the `included` member.
   """
 
-  alias Alembic.Relationships
   alias Alembic.ToParams
 
   @behaviour ToParams
@@ -28,14 +27,6 @@ defmodule Alembic.Resource do
                   name: "id"
                 }
               }
-
-  @relationships_options %{
-                           field: :relationships,
-                           member: %{
-                             module: Relationships,
-                             name: "relationships"
-                           }
-                         }
 
   @type_options %{
                   field: :type,
@@ -103,7 +94,7 @@ defmodule Alembic.Resource do
                id: id | nil,
                links: map | nil,
                meta: map | nil,
-               relationships: Relationships.t | nil,
+               relationships: map | nil,
                type: type
              }
 
@@ -188,10 +179,8 @@ defmodule Alembic.Resource do
         updated_converted_by_id_by_type = converted_by_id_by_type
                                           |> Map.put_new(type, %{})
                                           |> put_in([type, id], true)
-        relationships_params = Relationships.to_params(relationships,
-                                                       resource_by_id_by_type,
-                                                       updated_converted_by_id_by_type)
-        Map.merge(params, relationships_params)
+
+        Map.merge(params, %{})
     end
   end
 end

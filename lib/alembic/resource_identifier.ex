@@ -3,7 +3,6 @@ defmodule Alembic.ResourceIdentifier do
   A [JSON API Resource Identifier](http://jsonapi.org/format/#document-resource-identifier-objects).
   """
 
-  alias Alembic.Relationships
   alias Alembic.Resource
   alias Alembic.ToParams
 
@@ -98,9 +97,6 @@ defmodule Alembic.ResourceIdentifier do
 
             attributes
             |> Map.put("id", id)
-            |> Map.merge(
-                 Relationships.to_params(relationships, resource_by_id_by_type, updated_converted_by_id_by_type)
-               )
         end
       nil ->
         %{"id" => id}

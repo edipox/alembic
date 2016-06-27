@@ -17,7 +17,6 @@ defmodule Alembic.ResourceLinkage do
   """
 
   alias Alembic.Resource
-  alias Alembic.ResourceIdentifier
   alias Alembic.ToParams
 
   @behaviour ToParams
@@ -42,28 +41,6 @@ defmodule Alembic.ResourceLinkage do
   A resource identifier uses `resource_by_id_by_type` to fill in the attributes of the referenced resource. `type` is
   dropped as [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) doesn't verify types in the
   params.
-
-      iex> Alembic.ResourceLinkage.to_params(
-      ...>   %Alembic.ResourceIdentifier{
-      ...>     type: "shirt",
-      ...>     id: "1"
-      ...>   },
-      ...>   %{
-      ...>     "shirt" => %{
-      ...>       "1" => %Alembic.Resource{
-      ...>         type: "shirt",
-      ...>         id: "1",
-      ...>         attributes: %{
-      ...>           "size" => "L"
-      ...>         }
-      ...>       }
-      ...>     }
-      ...>   }
-      ...> )
-      %{
-        "id" => "1",
-        "size" => "L"
-      }
 
   On create or update, a relationship can be created by having an `Alembic.Resource.t`, in which case the
   attributes are supplied by the `Alembic.Resource.t`, instead of `resource_by_id_by_type`.
@@ -92,32 +69,6 @@ defmodule Alembic.ResourceLinkage do
   `type` is dropped as [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) doesn't verify types
   in the params.
 
-      iex> Alembic.ResourceLinkage.to_params(
-      ...>   [
-      ...>     %Alembic.ResourceIdentifier{
-      ...>       type: "shirt",
-      ...>       id: "1"
-      ...>     }
-      ...>   ],
-      ...>   %{
-      ...>     "shirt" => %{
-      ...>       "1" => %Alembic.Resource{
-      ...>         type: "shirt",
-      ...>         id: "1",
-      ...>         attributes: %{
-      ...>           "size" => "L"
-      ...>         }
-      ...>       }
-      ...>     }
-      ...>  }
-      ...> )
-      [
-        %{
-          "id" => "1",
-          "size" => "L"
-        }
-      ]
-
   On create or update, a relationship can be created by having an `Alembic.Resource`, in which case the
   attributes are supplied by the `Alembic.Resource`, instead of `attributes_by_id_by_type`.
 
@@ -139,11 +90,11 @@ defmodule Alembic.ResourceLinkage do
       ]
 
   """
-  @spec to_params([Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
+  @spec to_params([Resource.t] | Resource.t | nil,
                   ToParams.resource_by_id_by_type) :: ToParams.params
   def to_params(resource_linkage, resource_by_id_by_type), do: to_params(resource_linkage, resource_by_id_by_type, %{})
 
-  @spec to_params([Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
+  @spec to_params([Resource.t] | Resource.t | nil,
                   ToParams.resource_by_id_by_type,
                   ToParams.converted_by_id_by_type) :: ToParams.params
 
@@ -155,9 +106,5 @@ defmodule Alembic.ResourceLinkage do
 
   def to_params(resource = %Resource{}, resource_by_id_by_type, converted_by_id_by_type) do
     Resource.to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
-  end
-
-  def to_params(resource_identifier = %ResourceIdentifier{}, resource_by_id_by_type, converted_by_id_by_type) do
-    ResourceIdentifier.to_params(resource_identifier, resource_by_id_by_type, converted_by_id_by_type)
   end
 end

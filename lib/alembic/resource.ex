@@ -40,7 +40,6 @@ defmodule Alembic.Resource do
   # DOES NOT include `@attribute_options` because it needs to be customized with private function reference
   # DOES NOT include `@id_options` because it needs to be customized based on `error_template.meta`
   @child_options_list [
-    @relationships_options,
     @type_options
   ]
 
@@ -135,24 +134,6 @@ defmodule Alembic.Resource do
 
   Relationships's params are merged into the `resource`'s params
 
-      iex> Alembic.Resource.to_params(
-      ...>   %Alembic.Resource{
-      ...>     attributes: %{"text" => "First!"},
-      ...>     relationships: %{
-      ...>       "author" => %Alembic.Relationship{
-      ...>         data: %Alembic.ResourceIdentifier{id: 1, type: "author"}
-      ...>       }
-      ...>     },
-      ...>     type: "post"
-      ...>   },
-      ...>   %{}
-      ...> )
-      %{
-        "text" => "First!",
-        "author" => %{
-          "id" => 1
-        }
-      }
   """
   @spec to_params(t, ToParams.resource_by_id_by_type) :: ToParams.params
   def to_params(resource, resource_by_id_by_type), do: to_params(resource, resource_by_id_by_type, %{})
@@ -160,7 +141,7 @@ defmodule Alembic.Resource do
   @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
   def to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
 
-  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: relationships, type: type},
+  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: _, type: type},
                 resource_by_id_by_type,
                 converted_by_id_by_type) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
     case get_in(converted_by_id_by_type, [type, id]) do

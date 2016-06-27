@@ -12,7 +12,6 @@ defmodule Alembic.Relationships do
   > </cite>
   """
 
-  alias Alembic.Relationship
   alias Alembic.ToParams
 
   @behaviour ToParams
@@ -160,14 +159,9 @@ defmodule Alembic.Relationships do
   def to_params(nil, _, _), do: %{}
 
   @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
-  def to_params(relationship_by_name = %{}, resource_by_id_by_type = %{}, converted_by_id_by_type) do
-    Enum.reduce relationship_by_name, %{}, fn {name, relationship}, acc ->
-      case Relationship.to_params(relationship, resource_by_id_by_type, converted_by_id_by_type) do
-        {:error, :unset} ->
-          acc
-        relationship_params ->
-          Map.put(acc, name, relationship_params)
-      end
+  def to_params(relationship_by_name = %{}, %{}, _) do
+    Enum.reduce relationship_by_name, %{}, fn {_, _}, acc ->
+      acc
     end
   end
 end

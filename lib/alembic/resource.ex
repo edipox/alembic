@@ -7,8 +7,6 @@ defmodule Alembic.Resource do
 
   defstruct attributes: nil,
             id: nil,
-            links: nil,
-            meta: nil,
             relationships: nil,
             type: nil
 
@@ -28,8 +26,6 @@ defmodule Alembic.Resource do
   @type t :: %__MODULE__{
                attributes: Alembic.json_object | nil,
                id: id | nil,
-               links: map | nil,
-               meta: map | nil,
                relationships: map | nil,
                type: type
              }

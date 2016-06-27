@@ -7,7 +7,6 @@ defmodule Alembic.Document do
   alias Alembic.FromJson
   alias Alembic.Links
   alias Alembic.Meta
-  alias Alembic.Pagination
   alias Alembic.Resource
   alias Alembic.ResourceLinkage
   alias Alembic.ToEctoSchema
@@ -18,7 +17,6 @@ defmodule Alembic.Document do
   @behaviour FromJson
   @behaviour ToEctoSchema
   @behaviour ToParams
-  @behaviour Pagination
 
   # Constants
 
@@ -1348,160 +1346,6 @@ defmodule Alembic.Document do
                      ecto_schema_module_by_type) when is_list(resources) do
     Enum.map resources, &Resource.to_ecto_schema(&1, resource_by_id_by_type, ecto_schema_module_by_type)
   end
-
-  @doc """
-  Extract paged pagination information.
-
-  To support pagination, a document at minimum must have a `"record_count"` `meta` entry.
-
-      iex> Alembic.Document.to_pagination(
-      ...>   %Alembic.Document{meta: %{ "record_count" => 10 }}
-      ...> )
-      %Alembic.Pagination{ total_size: 10 }
-
-  Without it, the `"record_count"` `meta` entry, the pagination will be `nil`
-
-      iex> Alembic.Document.to_pagination(%Alembic.Document{})
-      nil
-
-
-  ## Single Page
-
-  When there is only one page, there will be a `"first"` and `"last"` link pointing to the same page, but no
-  "next" or "prev" links.  The `total_size` as given by the `meta` `"record_count"` will between `0` and
-  the page size because the last is not necessarily full.
-
-      iex> Alembic.Document.to_pagination(
-      ...>   %Alembic.Document{
-      ...>     links: %{
-      ...>       "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>       "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10"
-      ...>     },
-      ...>     meta: %{ "record_count" => 5 }
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        total_size: 5
-      }
-
-  ## Multiple Pages
-
-  When there are multiple pages, every page will have a `"first"` and `"last"` link pointing to the respective,
-  different pages.  The `total_size` as given by the `meta` `"record_count"` will be between
-  `(last.number - 1)  * last.size` and  `last.number * last.size` because the last page is not necessarily full.
-
-  On the first page, the `"next"` link will be set, but not the `"prev"` link.
-
-      iex> Alembic.Document.to_pagination(
-      ...>   %Alembic.Document{
-      ...>     links: %{
-      ...>       "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>       "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>       "next" => "https://example.com/api/v1/users?page%5Bnumber%5D=2&page%5Bsize%5D=10"
-      ...>     },
-      ...>     meta: %{ "record_count" => 25 }
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        next: %Alembic.Pagination.Page{
-          number: 2,
-          size: 10
-        },
-        total_size: 25
-      }
-
-  On any middle page, both the `"next"` and `"prev"` links will be set.
-
-      iex> Alembic.Document.to_pagination(
-      ...>   %Alembic.Document{
-      ...>     links: %{
-      ...>       "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>       "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>       "next" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>       "prev" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10"
-      ...>     },
-      ...>     meta: %{ "record_count" => 25 }
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        next: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        previous: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        total_size: 25
-      }
-
-  On the last page, the `"prev"` link will be set, but not the `"next"` link.
-
-      iex> Alembic.Document.to_pagination(
-      ...>   %Alembic.Document{
-      ...>     links: %{
-      ...>       "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>       "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>       "prev" => "https://example.com/api/v1/users?page%5Bnumber%5D=2&page%5Bsize%5D=10"
-      ...>     },
-      ...>     meta: %{ "record_count" => 25 }
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        previous: %Alembic.Pagination.Page{
-          number: 2,
-          size: 10
-        },
-        total_size: 25
-      }
-
-  """
-  @spec to_pagination(t) :: Pagination.t | nil
-
-  def to_pagination(%__MODULE__{links: links, meta: %{"record_count" => total_size}}) do
-    document_pagination = %Pagination{total_size: total_size}
-
-    case Links.to_pagination(links) do
-      nil ->
-        document_pagination
-      %Pagination{first: first, last: last, next: next, previous: previous} ->
-        %{document_pagination | first: first, last: last, next: next, previous: previous}
-    end
-  end
-
-  def to_pagination(%__MODULE__{}), do: nil
 
   @doc """
   Transforms a `t` into the nested params format used by

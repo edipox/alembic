@@ -12,12 +12,10 @@ defmodule Alembic.Links do
   alias Alembic.Error
   alias Alembic.FromJson
   alias Alembic.Link
-  alias Alembic.Pagination
 
   # Behaviours
 
   @behaviour FromJson
-  @behaviour Pagination
 
   # Constants
 
@@ -214,155 +212,7 @@ defmodule Alembic.Links do
     }
   end
 
-  @doc """
-  Converts the links to `Alembic.Pagination.t` page fields
-
-  ## Single Page
-
-  When there is only one page, there will be a `"first"` and `"last"` link pointing to the same page, but no
-  "next" or "prev" links.
-
-      iex> Alembic.Links.to_pagination(
-      ...>   %{
-      ...>     "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>     "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10"
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        }
-      }
-
-  ## Multiple Pages
-
-  When there are multiple pages, every page will have a `"first"` and `"last"` link pointing to the respective,
-  different pages.
-
-  On the first page, the `"next"` link will be set, but not the `"prev"` link.
-
-      iex> Alembic.Links.to_pagination(
-      ...>   %{
-      ...>     "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>     "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>     "next" => "https://example.com/api/v1/users?page%5Bnumber%5D=2&page%5Bsize%5D=10"
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        next: %Alembic.Pagination.Page{
-          number: 2,
-          size: 10
-        }
-      }
-
-  On any middle page, both the `"next"` and `"prev"` links will be set.
-
-      iex> Alembic.Links.to_pagination(
-      ...>   %{
-      ...>     "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>     "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>     "next" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>     "prev" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10"
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        next: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        previous: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        }
-      }
-
-  On the last page, the `"prev"` link will be set, but not the `"next"` link.
-
-      iex> Alembic.Links.to_pagination(
-      ...>   %{
-      ...>     "first" => "https://example.com/api/v1/users?page%5Bnumber%5D=1&page%5Bsize%5D=10",
-      ...>     "last" => "https://example.com/api/v1/users?page%5Bnumber%5D=3&page%5Bsize%5D=10",
-      ...>     "prev" => "https://example.com/api/v1/users?page%5Bnumber%5D=2&page%5Bsize%5D=10"
-      ...>   }
-      ...> )
-      %Alembic.Pagination{
-        first: %Alembic.Pagination.Page{
-          number: 1,
-          size: 10
-        },
-        last: %Alembic.Pagination.Page{
-          number: 3,
-          size: 10
-        },
-        previous: %Alembic.Pagination.Page{
-          number: 2,
-          size: 10
-        }
-      }
-
-  ## No Links
-
-  If there are no links, then `nil` will be returned
-
-      iex> Alembic.Links.to_pagination(nil)
-      nil
-
-  ## No pagination links
-
-  If there are links, but not for pagination, then `nil` will be returned
-
-      iex> Alembic.Links.to_pagination(%{ "about" => "https://example.com/about" })
-      nil
-
-  """
-  def to_pagination(links)
-
-  @spec to_pagination(nil) :: nil
-  def to_pagination(nil), do: nil
-
-  @spec to_pagination(t) :: Pagination.t
-  def to_pagination(links) when is_map(links) do
-    reduced = Enum.reduce(@pagination_field_by_key, %Pagination{}, &reduce_links_key_field_to_pagination(links, &1, &2))
-
-    case reduced do
-      %Pagination{first: nil, last: nil, next: nil, previous: nil} ->
-        nil
-      pagination ->
-        pagination
-    end
-  end
-
   ## Private Functions
-
-  defp reduce_links_key_field_to_pagination(links, {key, field}, acc = %Pagination{}) when is_map(links) do
-    case Map.fetch(links, key) do
-      {:ok, link} ->
-        %{acc | field => Link.to_page(link)}
-      :error ->
-        acc
-    end
-  end
 
   defp validate_link_pair({key, value_json}, collectable_result, error_template) do
     key_error_template = Error.descend(error_template, key)

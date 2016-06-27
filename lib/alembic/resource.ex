@@ -1,49 +1,7 @@
 defmodule Alembic.Resource do
-  @moduledoc """
-  The individual JSON object of elements of the list of the `data` member of the
-  [JSON API document](http://jsonapi.org/format/#document-structure) are
-  [resources](http://jsonapi.org/format/#document-resource-objects) as are the members of the `included` member.
-  """
-
   alias Alembic.ToParams
 
   @behaviour ToParams
-
-  # Constants
-
-  @attributes_human_type "json object"
-
-  @attributes_options %{
-                        field: :attributes,
-                        member: %{
-                          name: "attributes"
-                        }
-                      }
-
-  @id_options %{
-                field: :id,
-                member: %{
-                  from_json: &FromJson.string_from_json/2,
-                  name: "id"
-                }
-              }
-
-  @type_options %{
-                  field: :type,
-                  member: %{
-                    from_json: &FromJson.string_from_json/2,
-                    name: "type",
-                    required: true
-                  }
-                }
-
-  # DOES NOT include `@attribute_options` because it needs to be customized with private function reference
-  # DOES NOT include `@id_options` because it needs to be customized based on `error_template.meta`
-  @child_options_list [
-    @type_options
-  ]
-
-  @human_type "resource"
 
   # Struct
 
@@ -67,27 +25,6 @@ defmodule Alembic.Resource do
   """
   @type type :: String.t
 
-  @typedoc """
-  Resource objects" appear in a JSON API document to represent resources.
-
-  A resource object **MUST** contain at least the following top-level members:
-
-  * `id`
-  * `type`
-
-  Exception: The `id` member is not required when the resource object originates at the client and represents a new
-  resource to be created on the server. (`%{action: :create, source: :client}`)
-
-  In addition, a resource object **MAY(( contain any of these top-level members:
-
-  * `attributes` - an [attributes object](http://jsonapi.org/format/#document-resource-object-attributes) representing
-    some of the resource's data.
-  * `links` - a `String.t` or `map` containing links related to the resource.
-  * `meta` - contains non-standard meta-information about a resource that can not be represented as an attribute or
-    relationship.
-  * `relationships` - a [relationships object](http://jsonapi.org/format/#document-resource-object-relationships)
-    describing relationships between the resource and other JSON API resources.
-  """
   @type t :: %__MODULE__{
                attributes: Alembic.json_object | nil,
                id: id | nil,
@@ -99,42 +36,6 @@ defmodule Alembic.Resource do
 
   # Functions
 
-  @doc """
-  Converts `resource` to params format used by
-  [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4).
-  The `id` and `attributes` are combined into a single map for params.
-
-      iex> Alembic.Resource.to_params(
-      ...>   %Alembic.Resource{
-      ...>     attributes: %{"text" => "First!"},
-      ...>     id: "1",
-      ...>     type: "post"
-      ...>   },
-      ...>   %{}
-      ...> )
-      %{
-        "id" => "1",
-        "text" => "First!"
-      }
-
-  But, `id` won't show up as "id" in params if it is `nil`
-
-      iex> Alembic.Resource.to_params(
-      ...>   %Alembic.Resource{
-      ...>     attributes: %{"text" => "First!"},
-      ...>     type: "post"
-      ...>   },
-      ...>   %{}
-      ...> )
-      %{
-        "text" => "First!"
-      }
-
-  ## Relationships
-
-  Relationships's params are merged into the `resource`'s params
-
-  """
   @spec to_params(t, ToParams.resource_by_id_by_type) :: ToParams.params
   def to_params(resource, resource_by_id_by_type), do: to_params(resource, resource_by_id_by_type, %{})
 

@@ -11,7 +11,6 @@ defmodule Alembic.Relationship do
   > </cite>
   """
 
-  alias Alembic.Links
   alias Alembic.ResourceLinkage
   alias Alembic.ToParams
 
@@ -30,14 +29,6 @@ defmodule Alembic.Relationship do
 
   @human_type "relationship"
 
-  @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   },
-                   parent: nil
-                 }
   # Struct
 
   defstruct data: :unset,
@@ -66,7 +57,7 @@ defmodule Alembic.Relationship do
   """
   @type t :: %__MODULE__{
                data: [ResourceIdentifier.t] | ResourceIdentifier.t | nil | :unset,
-               links: Links.links,
+               links: map,
                meta: %{}
              }
 

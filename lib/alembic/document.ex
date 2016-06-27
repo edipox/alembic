@@ -3,7 +3,6 @@ defmodule Alembic.Document do
   JSON API refers to the top-level JSON structure as a [document](http://jsonapi.org/format/#document-structure).
   """
 
-  alias Alembic.Links
   alias Alembic.Resource
   alias Alembic.ResourceLinkage
   alias Alembic.ToParams
@@ -38,14 +37,6 @@ defmodule Alembic.Document do
 
   @human_type "document"
 
-  @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
-
   @minimum_children ~w{data errors meta}
 
   # DOES NOT include `@errors_options` because `&FromJson.from_json_array(&1, &2, Error)` cannot appear in a module
@@ -53,8 +44,7 @@ defmodule Alembic.Document do
   # DOES NOT include `@included_options` because `&FromJson.from_json_array(&1, &2, Resource)` cannot appear in a module
   #   attribute used in a function
   @child_options_list [
-    @data_options,
-    @links_options
+    @data_options
   ]
 
   # Struct
@@ -112,21 +102,21 @@ defmodule Alembic.Document do
                data: nil,
                errors: list,
                included: nil,
-               links: Links.t | nil,
+               links: map | nil,
                meta: map | nil
              } |
              %__MODULE__{
                data: nil,
                errors: nil,
                included: nil,
-               links: Links.t | nil,
+               links: map | nil,
                meta: map
              } |
              %__MODULE__{
                data: [Resource.t] | Resource.t,
                errors: nil,
                included: [Resource.t] | nil,
-               links: Links.t | nil,
+               links: map | nil,
                meta: map | nil
              }
 

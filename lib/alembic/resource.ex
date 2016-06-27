@@ -5,7 +5,6 @@ defmodule Alembic.Resource do
   [resources](http://jsonapi.org/format/#document-resource-objects) as are the members of the `included` member.
   """
 
-  alias Alembic.Links
   alias Alembic.Relationships
   alias Alembic.ToParams
 
@@ -30,14 +29,6 @@ defmodule Alembic.Resource do
                 }
               }
 
-  @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
-
   @relationships_options %{
                            field: :relationships,
                            member: %{
@@ -58,7 +49,6 @@ defmodule Alembic.Resource do
   # DOES NOT include `@attribute_options` because it needs to be customized with private function reference
   # DOES NOT include `@id_options` because it needs to be customized based on `error_template.meta`
   @child_options_list [
-    @links_options,
     @relationships_options,
     @type_options
   ]
@@ -111,7 +101,7 @@ defmodule Alembic.Resource do
   @type t :: %__MODULE__{
                attributes: Alembic.json_object | nil,
                id: id | nil,
-               links: Links.t | nil,
+               links: map | nil,
                meta: map | nil,
                relationships: Relationships.t | nil,
                type: type

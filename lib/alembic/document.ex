@@ -4,31 +4,18 @@ defmodule Alembic.Document do
   # Struct
 
   defstruct data: :unset,
-            errors: nil,
-            included: nil,
-            jsonapi: nil,
-            links: nil,
-            meta: nil
+            included: nil
 
   @type t :: %__MODULE__{
                data: nil,
-               errors: list,
-               included: nil,
-               links: map | nil,
-               meta: map | nil
+               included: nil
              } |
              %__MODULE__{
                data: nil,
-               errors: nil,
-               included: nil,
-               links: map | nil,
-               meta: map
+               included: nil
              } |
              %__MODULE__{
                data: [Resource.t] | Resource.t,
-               errors: nil,
-               included: [Resource.t] | nil,
-               links: map | nil,
-               meta: map | nil
+               included: [Resource.t] | nil
              }
 end

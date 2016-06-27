@@ -12,7 +12,6 @@ defmodule Alembic.Relationship do
   """
 
   alias Alembic.Links
-  alias Alembic.Meta
   alias Alembic.ResourceLinkage
   alias Alembic.ToParams
 
@@ -39,15 +38,6 @@ defmodule Alembic.Relationship do
                    },
                    parent: nil
                  }
-
-  @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
   # Struct
 
   defstruct data: :unset,
@@ -77,7 +67,7 @@ defmodule Alembic.Relationship do
   @type t :: %__MODULE__{
                data: [ResourceIdentifier.t] | ResourceIdentifier.t | nil | :unset,
                links: Links.links,
-               meta: Meta.t
+               meta: %{}
              }
 
   # Functions

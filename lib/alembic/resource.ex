@@ -6,7 +6,6 @@ defmodule Alembic.Resource do
   """
 
   alias Alembic.Links
-  alias Alembic.Meta
   alias Alembic.Relationships
   alias Alembic.ToParams
 
@@ -39,14 +38,6 @@ defmodule Alembic.Resource do
                    }
                  }
 
-  @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
-
   @relationships_options %{
                            field: :relationships,
                            member: %{
@@ -68,7 +59,6 @@ defmodule Alembic.Resource do
   # DOES NOT include `@id_options` because it needs to be customized based on `error_template.meta`
   @child_options_list [
     @links_options,
-    @meta_options,
     @relationships_options,
     @type_options
   ]
@@ -122,7 +112,7 @@ defmodule Alembic.Resource do
                attributes: Alembic.json_object | nil,
                id: id | nil,
                links: Links.t | nil,
-               meta: Meta.t | nil,
+               meta: map | nil,
                relationships: Relationships.t | nil,
                type: type
              }

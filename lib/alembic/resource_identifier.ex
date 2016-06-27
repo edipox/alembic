@@ -3,7 +3,6 @@ defmodule Alembic.ResourceIdentifier do
   A [JSON API Resource Identifier](http://jsonapi.org/format/#document-resource-identifier-objects).
   """
 
-  alias Alembic.Meta
   alias Alembic.Relationships
   alias Alembic.Resource
   alias Alembic.ToParams
@@ -13,15 +12,6 @@ defmodule Alembic.ResourceIdentifier do
   # Constants
 
   @human_type "resource identifier"
-
-  @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
 
   # Struct
 
@@ -36,7 +26,7 @@ defmodule Alembic.ResourceIdentifier do
   > A "resource identifier object" **MUST** contain `type` and `id` members.
   >
   > A "resource identifier object" **MAY** also include a `meta` member, whose value is a
-  > \\[`Alembic.Meta.t`\\] that contains non-standard meta-information.
+  > `map` that contains non-standard meta-information.
   >
   > -- <cite>
   >  [JSON API - Document Structure - Resource Identifier
@@ -45,7 +35,7 @@ defmodule Alembic.ResourceIdentifier do
   """
   @type t :: %__MODULE__{
                id: String.t,
-               meta: Meta.t,
+               meta: %{},
                type: String.t
              }
 

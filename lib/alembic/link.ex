@@ -3,20 +3,9 @@ defmodule Alembic.Link do
   A [link object](http://jsonapi.org/format/#document-links) represents a URL and metadata about it.
   """
 
-  alias Alembic.Meta
-
   # Constants
 
   @human_type "link object"
-
-  @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
 
   # Struct
 
@@ -32,7 +21,7 @@ defmodule Alembic.Link do
   """
   @type t :: %__MODULE__{
                href: String.t | nil,
-               meta: Meta.t | nil
+               meta: map | nil
              }
 
   @typedoc """

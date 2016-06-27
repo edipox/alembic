@@ -4,7 +4,6 @@ defmodule Alembic.Document do
   """
 
   alias Alembic.Links
-  alias Alembic.Meta
   alias Alembic.Resource
   alias Alembic.ResourceLinkage
   alias Alembic.ToParams
@@ -49,22 +48,13 @@ defmodule Alembic.Document do
 
   @minimum_children ~w{data errors meta}
 
-  @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
-
   # DOES NOT include `@errors_options` because `&FromJson.from_json_array(&1, &2, Error)` cannot appear in a module
   #   attribute used in a function
   # DOES NOT include `@included_options` because `&FromJson.from_json_array(&1, &2, Resource)` cannot appear in a module
   #   attribute used in a function
   @child_options_list [
     @data_options,
-    @links_options,
-    @meta_options
+    @links_options
   ]
 
   # Struct
@@ -123,21 +113,21 @@ defmodule Alembic.Document do
                errors: list,
                included: nil,
                links: Links.t | nil,
-               meta: Meta.t | nil
+               meta: map | nil
              } |
              %__MODULE__{
                data: nil,
                errors: nil,
                included: nil,
                links: Links.t | nil,
-               meta: Meta.t
+               meta: map
              } |
              %__MODULE__{
                data: [Resource.t] | Resource.t,
                errors: nil,
                included: [Resource.t] | nil,
                links: Links.t | nil,
-               meta: Meta.t | nil
+               meta: map | nil
              }
 
   # Functions

@@ -3,23 +3,35 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.1.0](#v210)
+  - [v2.2.0](#v220)
     - [Enhancements](#enhancements)
+  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes)
-  - [v2.0.1](#v201)
-    - [Bug Fixes](#bug-fixes-1)
-  - [v2.0.0](#v200)
+  - [v2.1.0](#v210)
     - [Enhancements](#enhancements-1)
+    - [Bug Fixes](#bug-fixes-1)
+  - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-2)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-2)
+    - [Bug Fixes](#bug-fixes-3)
     - [Incompatible Changes](#incompatible-changes)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-2)
+    - [Enhancements](#enhancements-3)
     - [Incompatible Changes](#incompatible-changes-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
 
+## v2.2.0
+
+### Enhancements
+* [#31](https://github.com/C-S-D/alembic/pull/30) - [KronicDeth](https://github.com/KronicDeth)
+  - Update `ex_doc` to `0.12.0`
+  - Update `credo` to `0.4.5`
+  - Update `ecto` to `2.0.2`.  Compatibility range is changed from `~> 1.1` to `~> 1.1 or ~> 2.0`, so no incompatibility is introduced for runtime dependencies.
+  
 ## v2.1.1
 
 ### Bug Fixes

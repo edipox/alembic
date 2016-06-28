@@ -42,7 +42,7 @@ defmodule Alembic.Mixfile do
   defp deps do
     [
       # static code analysis for style and consistency
-      {:credo, "~> 0.3.13", only: [:dev, :test]},
+      {:credo, "~> 0.4.5", only: [:dev, :test]},
       # test coverge tool.  Allow `--cover` option for `mix test`
       {:coverex, "~> 1.4", only: :test},
       # success type checker: ensures @type and @spec are valid
@@ -50,9 +50,9 @@ defmodule Alembic.Mixfile do
       # markdown to HTML converter for ex_doc
       {:earmark, "~> 0.2.1", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
-      {:ecto, "~> 1.1"},
+      {:ecto, "~> 1.1 or ~> 2.0"},
       # documentation generation
-      {:ex_doc, "~> 0.11.5", only: [:dev, :test]},
+      {:ex_doc, "~> 0.12.0", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI

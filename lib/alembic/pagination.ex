@@ -3,7 +3,7 @@ defmodule Alembic.Pagination do
   Pagination by fixed-size pages
   """
 
-  alias InterpreterServer.Api.Pagination.Page
+  alias Alembic.Page
 
   # Struct
 

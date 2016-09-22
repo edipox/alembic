@@ -100,6 +100,18 @@ defmodule Alembic.Pagination.Page do
     }
   end
 
+  @doc """
+  Converts the `page` back to query portion of URI
+
+      iex> Alembic.Pagination.Page.to_query(%Alembic.Pagination.Page{number: 2, size: 10})
+      "page%5Bnumber%5D=2&page%5Bsize%5D=10"
+
+  """
+  @spec to_query(t) :: String.t
+  def to_query(%__MODULE__{number: number, size: size}) do
+    URI.encode_query ["page[number]": number, "page[size]": size]
+  end
+
   ## Private Functions
 
   defp reduce_decoded_query_to_page({"page[number]", encoded_page_number}, page = %__MODULE__{}) do

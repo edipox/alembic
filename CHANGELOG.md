@@ -3,26 +3,46 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.2.0](#v220)
+  - [v2.3.0](#v230)
     - [Enhancements](#enhancements)
-  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes)
-  - [v2.1.0](#v210)
+  - [v2.2.0](#v220)
     - [Enhancements](#enhancements-1)
+  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-1)
-  - [v2.0.1](#v201)
-    - [Bug Fixes](#bug-fixes-2)
-  - [v2.0.0](#v200)
+  - [v2.1.0](#v210)
     - [Enhancements](#enhancements-2)
+    - [Bug Fixes](#bug-fixes-2)
+  - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-3)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-3)
+    - [Bug Fixes](#bug-fixes-4)
     - [Incompatible Changes](#incompatible-changes)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-3)
+    - [Enhancements](#enhancements-4)
     - [Incompatible Changes](#incompatible-changes-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v2.3.0
+
+### Enhancements
+* [#32](https://github.com/C-S-D/alembic/pull/32) - `Alembic.Pagination.to_links/2` allows converting `Alembic.Pagination.t` from `Alembic.Links.to_pagination` back to `Alembic.Links.t` with urls. - [KronicDeth](https://github.com/KronicDeth)
+* [#33](https://github.com/C-S-D/alembic/pull/33) - [KronicDeth](https://github.com/KronicDeth)
+  * Update `coverex` to `1.4.10`
+  * Update `credo` to `0.4.11`
+  * Update `ecto` to `2.0.5`
+  * Update `hackney` to `1.6.1`
+  * Update `httpoison` to `0.9.1`
+  * Update `inch_ex` to `0.5.4` 
+  * Update `junit_formatter` to `1.1.0`
+    * JUnit output location changed from `_build/test/test-junit-report.xml` to `_build/test/lib/alembic/test-junit-report.xml`
+
+### Bug Fixes
+* [#32](https://github.com/C-S-D/alembic/pull/32) - Fix `alias` that wasn't renamed - [KronicDeth](https://github.com/KronicDeth)
 
 ## v2.2.0
 

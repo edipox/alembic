@@ -66,9 +66,7 @@ defmodule Alembic.Mixfile do
     """
     A JSONAPI 1.0 library fully-tested against all jsonapi.org examples.  The library generates JSONAPI errors documents
     whenever it encounters a malformed JSONAPI document, so that servers don't need to worry about JSONAPI format
-    errors.  Poison.Encoder implementations ensure the structs can be turned back into JSON strings:
-    struct->encoding->decoding->conversion to struct is tested to ensure idempotency and that the library
-    can parse its own JSONAPI errors documents.
+    errors.
     """
   end
 

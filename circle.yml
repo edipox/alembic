@@ -25,7 +25,6 @@ test:
   override:
     - mix test --cover
   post:
-    - mix credo --strict
     - mix dialyze
     - mix docs 2>&1 | tee mix-docs.txt
     - if grep "Closing unclosed backquotes" mix-docs.txt; then exit 1; fi

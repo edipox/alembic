@@ -3,29 +3,36 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.3.0](#v230)
+  - [v2.4.0](#v240)
     - [Enhancements](#enhancements)
+  - [v2.3.0](#v230)
+    - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes)
   - [v2.2.0](#v220)
-    - [Enhancements](#enhancements-1)
+    - [Enhancements](#enhancements-2)
   - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-1)
   - [v2.1.0](#v210)
-    - [Enhancements](#enhancements-2)
+    - [Enhancements](#enhancements-3)
     - [Bug Fixes](#bug-fixes-2)
   - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-3)
   - [v2.0.0](#v200)
-    - [Enhancements](#enhancements-3)
+    - [Enhancements](#enhancements-4)
     - [Bug Fixes](#bug-fixes-4)
     - [Incompatible Changes](#incompatible-changes)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-4)
+    - [Enhancements](#enhancements-5)
     - [Incompatible Changes](#incompatible-changes-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v2.4.0
+
+### Enhancements
+* [#38](https://github.com/C-S-D/alembic/pull/38) - CodeClimate just added credo support to their beta engines channel.  Running on CodeClimate will allow the credo tests to run in parallel with CircleCI, leading to faster overall build times. - [KronicDeth](https://github.com/KronicDeth)
 
 ## v2.3.0
 

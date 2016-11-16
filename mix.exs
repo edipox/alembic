@@ -52,7 +52,7 @@ defmodule Alembic.Mixfile do
       # conversion to Ecto.Schema struct
       {:ecto, "~> 2.0"},
       # documentation generation
-      {:ex_doc, "~> 0.13.0", only: [:dev, :test]},
+      {:ex_doc, "~> 0.14.3", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI

@@ -24,7 +24,7 @@ defmodule Alembic.Mixfile do
       source_url: "https://github.com/C-S-D/alembic",
       start_permanent: Mix.env == :prod,
       test_coverage: [tool: Coverex.Task],
-      version: "2.4.0"
+      version: "3.0.0"
     ]
   end
 
@@ -50,7 +50,7 @@ defmodule Alembic.Mixfile do
       # markdown to HTML converter for ex_doc
       {:earmark, "~> 1.0", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
-      {:ecto, "~> 1.1 or ~> 2.0"},
+      {:ecto, "~> 2.0"},
       # documentation generation
       {:ex_doc, "~> 0.13.0", only: [:dev, :test]},
       # documentation coverage

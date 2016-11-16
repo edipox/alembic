@@ -140,7 +140,7 @@ defmodule Alembic.Document do
                meta: Meta.t
              } |
              %__MODULE__{
-               data: [Resource.t] | Resource.t,
+               data: [Resource.t] | Resource.t | nil,
                errors: nil,
                included: [Resource.t] | nil,
                links: Links.t | nil,

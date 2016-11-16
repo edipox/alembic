@@ -126,14 +126,14 @@ defmodule Alembic.Document do
 
   """
   @type t :: %__MODULE__{
-               data: nil,
+               data: :unset,
                errors: [Error.t],
                included: nil,
                links: Links.t | nil,
                meta: Meta.t | nil
              } |
              %__MODULE__{
-               data: nil,
+               data: :unset,
                errors: nil,
                included: nil,
                links: Links.t | nil,

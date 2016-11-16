@@ -3,31 +3,55 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.4.0](#v240)
+  - [v3.0.0](#v300)
     - [Enhancements](#enhancements)
-  - [v2.3.0](#v230)
-    - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes)
-  - [v2.2.0](#v220)
-    - [Enhancements](#enhancements-2)
-  - [v2.1.1](#v211)
-    - [Bug Fixes](#bug-fixes-1)
-  - [v2.1.0](#v210)
-    - [Enhancements](#enhancements-3)
-    - [Bug Fixes](#bug-fixes-2)
-  - [v2.0.1](#v201)
-    - [Bug Fixes](#bug-fixes-3)
-  - [v2.0.0](#v200)
-    - [Enhancements](#enhancements-4)
-    - [Bug Fixes](#bug-fixes-4)
     - [Incompatible Changes](#incompatible-changes)
-  - [v1.0.0](#v100)
+  - [v2.4.0](#v240)
+    - [Enhancements](#enhancements-1)
+  - [v2.3.0](#v230)
+    - [Enhancements](#enhancements-2)
+    - [Bug Fixes](#bug-fixes-1)
+  - [v2.2.0](#v220)
+    - [Enhancements](#enhancements-3)
+  - [v2.1.1](#v211)
+    - [Bug Fixes](#bug-fixes-2)
+  - [v2.1.0](#v210)
+    - [Enhancements](#enhancements-4)
+    - [Bug Fixes](#bug-fixes-3)
+  - [v2.0.1](#v201)
+    - [Bug Fixes](#bug-fixes-4)
+  - [v2.0.0](#v200)
     - [Enhancements](#enhancements-5)
+    - [Bug Fixes](#bug-fixes-5)
     - [Incompatible Changes](#incompatible-changes-1)
+  - [v1.0.0](#v100)
+    - [Enhancements](#enhancements-6)
+    - [Incompatible Changes](#incompatible-changes-2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v3.0.0
+
+### Enhancements
+
+* [#39](https://github.com/C-S-D/alembic/pull/39) - [KronicDeth](https://github.com/KronicDeth)
+  * Update dependencies
+    * `credo` to `0.5.2`
+    * `ex_doc` to `0.14.3`
+    * `inch_ex` to `0.5.5`
+    * `junit_formatter` to `1.1.0`
+  * Build with Erlang 19.1 and Elixir 1.3.4 on CircleCI.
+ 
+### Bug Fixes
+* [#39](https://github.com/C-S-D/alembic/pull/39) - [KronicDeth](https://github.com/KronicDeth)
+  * Ecto 2.1 makes the warning about `cast/4` instead of `cast/3` noisy, but Ecto 1.X had the opposite warning to use `cast/4` instead of `cast/3`, so use `cast/3`.
+  * Fix all Erlang 19.1 dialyzer warnings.
+  
+### Incompatible Changes
+* [#39](https://github.com/C-S-D/alembic/pull/39) - Drop Ecto 1.0 since Ecto 1.0's `cast/3` is different than Ecto 2.0's `cast/3.` - [KronicDeth](https://github.com/KronicDeth)
 
 ## v2.4.0
 

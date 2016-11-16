@@ -126,14 +126,14 @@ defmodule Alembic.Error do
     the problem, except for purposes of localization.
   """
   @type t :: %__MODULE__{
-               code: String.t,
-               detail: String.t,
-               id: String.t,
-               links: Links.t,
-               meta: Meta.t,
+               code: String.t | nil,
+               detail: String.t | nil,
+               id: String.t | nil,
+               links: Links.t | nil,
+               meta: Meta.t | nil,
                source: Source.t,
-               status: String.t,
-               title: String.t
+               status: String.t | nil,
+               title: String.t | nil
              }
 
   @doc """

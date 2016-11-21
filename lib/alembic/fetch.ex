@@ -21,7 +21,7 @@ defmodule Alembic.Fetch do
   @typedoc """
   The options when performing a fetch
 
-  * `:include` - The relationships paths to include in the response document
+  * `:includes` - The relationships paths to include in the response document
   """
   @type t :: %__MODULE__{
                includes: nil | Includes.t

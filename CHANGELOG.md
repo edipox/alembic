@@ -33,6 +33,14 @@
 
 # Changelog
 
+## v3.1.0
+
+### Enhancements
+* [#40](https://github.com/C-S-D/alembic/pull/40) - `Alembic.Fetch.from_params`, in addition to parsing out the includes will not also parse out the sorts in the `"sort"` parameter using `Alembic.Fetch.Sorts.from_params`.  To transform the `Alembic.Fetch.Sorts.t` back to the string format in `"sort"`, you can use `Alembic.Fetch.Sorts.to_string/1`. - [KronicDeth](https://github.com/KronicDeth)
+
+### Bug Fixes
+* [#40](https://github.com/C-S-D/alembic/pull/40) - Change `:include` to `:includes` in the `@typedoc` for `Alembic.Fetch.t` - [KronicDeth](https://github.com/KronicDeth)
+
 ## v3.0.0
 
 ### Enhancements

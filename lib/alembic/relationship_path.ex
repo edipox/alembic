@@ -31,6 +31,18 @@ defmodule Alembic.RelationshipPath do
   """
   def relationship_name_separator, do: "."
 
+  @doc false
+
+  @spec reverse_relationship_names_to_include([]) :: nil
+  def reverse_relationship_names_to_include([]), do: nil
+
+  @spec reverse_relationship_names_to_include([relationship_name, ...]) :: Includes.include
+  def reverse_relationship_names_to_include(reverse_relationship_names) do
+    Enum.reduce reverse_relationship_names, fn (relationship_name, include) ->
+      %{relationship_name => include}
+    end
+  end
+
   @doc """
   Breaks the `relationship_path` into `relationship_name`s in a nested map to form
   `Alembic.Fetch.Include.include`
@@ -50,13 +62,11 @@ defmodule Alembic.RelationshipPath do
       }
 
   """
-  @spec to_include(t) :: Includes.include
+  @spec to_include(t) :: Includes.include | nil
   def to_include(relationship_path) do
     relationship_path
     |> String.split(relationship_name_separator)
     |> Enum.reverse
-    |> Enum.reduce(fn (relationship_name, include) ->
-         %{relationship_name => include}
-       end)
+    |> reverse_relationship_names_to_include()
   end
 end

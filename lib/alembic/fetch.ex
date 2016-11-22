@@ -4,12 +4,13 @@ defmodule Alembic.Fetch do
   """
 
   alias Alembic.Document
-  alias __MODULE__.Includes
+  alias __MODULE__.{Includes, Sorts}
   alias Ecto.Query
 
   # Struct
 
-  defstruct [:includes]
+  defstruct includes: [],
+            sorts: []
 
   # Types
 
@@ -21,10 +22,12 @@ defmodule Alembic.Fetch do
   @typedoc """
   The options when performing a fetch
 
-  * `:include` - The relationships paths to include in the response document
+  * `:includes` - The relationships paths to include in the response document
+  * `:sorts` - The attributes and their direction to sort in the response document.
   """
   @type t :: %__MODULE__{
-               includes: nil | Includes.t
+               includes: Includes.t,
+               sorts: Sorts.t
              }
 
   # Functions
@@ -59,11 +62,38 @@ defmodule Alembic.Fetch do
           ]
         }
 
+  `params` with `"sort"` will ahve the value of `"sort"` broken into `Alembic.Fetch.Sorts.t`
+
+        iex> Alembic.Fetch.from_params(
+        ...>   %{
+        ...>     "sort" => "author.name,-comments.author.posts.inserted-at"
+        ...>   }
+        ...> )
+        %Alembic.Fetch{
+          sorts: [
+            %Alembic.Fetch.Sort{
+              attribute: "name",
+              direction: :ascending,
+              relationship: "author"
+            },
+            %Alembic.Fetch.Sort{
+              attribute: "inserted-at",
+              direction: :descending,
+              relationship: %{
+                "comments" => %{
+                  "author" => "posts"
+                }
+              }
+            }
+          ]
+        }
+
   """
   @spec from_params(params) :: t
   def from_params(params) when is_map(params) do
     %__MODULE__{
-      includes: Includes.from_params(params)
+      includes: Includes.from_params(params),
+      sorts: Sorts.from_params(params)
     }
   end
 

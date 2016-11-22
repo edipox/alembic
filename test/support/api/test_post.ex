@@ -8,6 +8,8 @@ defmodule Alembic.TestPost do
   schema "posts" do
     field :text, :string
 
+    timestamps
+
     belongs_to :author, Alembic.TestAuthor
     has_many :comments, Alembic.TestComment
   end

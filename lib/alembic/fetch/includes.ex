@@ -480,4 +480,8 @@ defmodule Alembic.Fetch.Includes do
     descendant_include = include[relationship_name]
     to_relationship_path(descendant_include, [relationship_name | relationship_names])
   end
+
+  defp to_relationship_path(include, relationship_names) do
+    raise ArgumentError, "include (#{inspect include}) must either be map or String relationship_name"
+  end
 end

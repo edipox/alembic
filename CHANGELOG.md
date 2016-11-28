@@ -33,6 +33,13 @@
 
 # Changelog
 
+## v3.1.1
+
+### Bug Fixes
+* [#41](https://github.com/C-S-D/alembic/pull/41) - [@KronicDeth](https://github.com/KronicDeth)
+  * Allow `atom` for `Alembic.Error.t` `:meta` value as `atom` is used for `"action"` and `"sender"` values in error templates.
+  * `Alembic.Source.t` needs to be clarified to show that either the `:parameter` is a `String.t` and `:pointer` is `nil` OR `:parameter` is `nil` and `:pointer` is a JSON pointer.
+
 ## v3.1.0
 
 ### Enhancements

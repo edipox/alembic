@@ -37,6 +37,11 @@ defmodule Alembic.Source do
   """
   @type t :: %__MODULE__{
                parameter: String.t,
+               pointer: nil
+             }
+             |
+             %__MODULE__{
+               parameter: nil,
                pointer: Api.json_pointer
              }
 

@@ -130,7 +130,7 @@ defmodule Alembic.Error do
                detail: String.t | nil,
                id: String.t | nil,
                links: Links.t | nil,
-               meta: Meta.t | nil,
+               meta: %{String.t => Alembic.json | atom} | nil,
                source: Source.t,
                status: String.t | nil,
                title: String.t | nil

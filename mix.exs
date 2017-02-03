@@ -43,14 +43,12 @@ defmodule Alembic.Mixfile do
     [
       # static code analysis for style and consistency
       {:credo, "~> 0.5.2", only: [:dev, :test]},
-      # test coverge tool.  Allow `--cover` option for `mix test`
-      {:coverex, "~> 1.4", only: :test},
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
       {:earmark, "~> 1.0", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
-      {:ecto, "~> 2.0"},
+      {:ecto, "~> 2.0 or ~> 3.0"},
       # documentation generation
       {:ex_doc, "~> 0.14.3", only: [:dev, :test]},
       # documentation coverage
@@ -58,7 +56,7 @@ defmodule Alembic.Mixfile do
       # formats test output for CircleCI
       {:junit_formatter, "~> 1.0", only: :test},
       # JSON decode and encoding.  Protocols are implemented for Alembic.* structs
-      {:poison, "~> 1.5 or ~> 2.0"}
+      {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0"}
     ]
   end
 

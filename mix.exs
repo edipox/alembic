@@ -59,7 +59,7 @@ defmodule Alembic.Mixfile do
       # test coverge tool.  Allow `--cover` option for `mix test`
       {:excoveralls, "~> 0.6.3", only: :test},
       # documentation generation
-      {:ex_doc, "~> 0.14.3", only: [:dev, :test]},
+      {:ex_doc, "~> 0.15.1", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI

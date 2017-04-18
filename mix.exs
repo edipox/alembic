@@ -21,9 +21,16 @@ defmodule Alembic.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env),
       name: "Alembic",
       package: package,
+      preferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.circle": :test,
+        "coveralls.detail": :test,
+        "coveralls.html": :test,
+        "coveralls.post": :test
+      ],
       source_url: "https://github.com/C-S-D/alembic",
       start_permanent: Mix.env == :prod,
-      test_coverage: [tool: Coverex.Task],
+      test_coverage: [tool: ExCoveralls],
       version: "3.1.1"
     ]
   end
@@ -43,14 +50,14 @@ defmodule Alembic.Mixfile do
     [
       # static code analysis for style and consistency
       {:credo, "~> 0.5.2", only: [:dev, :test]},
-      # test coverge tool.  Allow `--cover` option for `mix test`
-      {:coverex, "~> 1.4", only: :test},
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
       {:earmark, "~> 1.0", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
       {:ecto, "~> 2.0"},
+      # test coverge tool.  Allow `--cover` option for `mix test`
+      {:excoveralls, "~> 0.6.3", only: :test},
       # documentation generation
       {:ex_doc, "~> 0.14.3", only: [:dev, :test]},
       # documentation coverage

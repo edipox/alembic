@@ -11,6 +11,7 @@
 # Alembic
 
 [![CircleCI](https://circleci.com/gh/C-S-D/alembic.svg?style=svg)](https://circleci.com/gh/C-S-D/alembic)
+[![Coverage Status](https://coveralls.io/repos/github/C-S-D/alembic/badge.svg?branch=master)](https://coveralls.io/github/C-S-D/alembic?branch=master)
 [![Code Climate](https://codeclimate.com/github/C-S-D/alembic/badges/gpa.svg)](https://codeclimate.com/github/C-S-D/alembic)
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/C-S-D/alembic.svg)](https://beta.hexfaktor.org/github/C-S-D/alembic)
 [![Inline docs](http://inch-ci.org/github/C-S-D/alembic.svg)](http://inch-ci.org/github/C-S-D/alembic)

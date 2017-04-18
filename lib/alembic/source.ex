@@ -9,15 +9,6 @@ defmodule Alembic.Source do
 
   @behaviour FromJson
 
-  # Constants
-
-  @parameter_options %{
-                       field: :parameter,
-                       member: %{
-                         from_json: &FromJson.string_from_json/2
-                       }
-                     }
-
   # Struct
 
   defstruct [:parameter, :pointer]

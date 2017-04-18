@@ -102,7 +102,7 @@ defmodule Alembic.Fetch.Includes do
   @spec from_string(String.t) :: t
   def from_string(comma_separated_relationship_paths) do
     comma_separated_relationship_paths
-    |> String.splitter(relationship_path_separator, trim: true)
+    |> String.splitter(relationship_path_separator(), trim: true)
     |> Enum.map(&RelationshipPath.to_include/1)
   end
 
@@ -454,7 +454,7 @@ defmodule Alembic.Fetch.Includes do
   def to_string(includes) when is_list(includes) do
     includes
     |> Stream.map(&to_relationship_path/1)
-    |> Enum.join(relationship_path_separator)
+    |> Enum.join(relationship_path_separator())
   end
 
   ## Private Functions

@@ -64,8 +64,8 @@ defmodule Alembic.RelationshipPath do
   @spec to_include(t) :: Includes.include | nil
   def to_include(relationship_path) do
     relationship_path
-    |> String.split(relationship_name_separator)
-    |> Enum.reverse
+    |> String.split(relationship_name_separator())
+    |> Enum.reverse()
     |> reverse_relationship_names_to_include()
   end
 end

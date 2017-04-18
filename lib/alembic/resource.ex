@@ -1096,7 +1096,7 @@ defmodule Alembic.Resource do
   # the `"id" is required.
   @spec child_options_list_from_meta(map) :: [map, ...]
   defp child_options_list_from_meta(meta) do
-    [attributes_options, id_options_from_meta(meta) | @child_options_list]
+    [attributes_options(), id_options_from_meta(meta) | @child_options_list]
   end
 
   @spec id_options_from_meta(%{String.t => atom}) :: map

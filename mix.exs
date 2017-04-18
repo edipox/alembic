@@ -14,13 +14,13 @@ defmodule Alembic.Mixfile do
     [
       app: :alembic,
       build_embedded: Mix.env == :prod,
-      description: description,
-      deps: deps,
-      docs: docs,
+      description: description(),
+      deps: deps(),
+      docs: docs(),
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
       name: "Alembic",
-      package: package,
+      package: package(),
       preferred_cli_env: [
         "coveralls": :test,
         "coveralls.circle": :test,
@@ -79,7 +79,7 @@ defmodule Alembic.Mixfile do
 
   defp docs do
     [
-      extras: extras
+      extras: extras()
     ]
   end
 
@@ -99,7 +99,7 @@ defmodule Alembic.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs" | extras],
+      files: ["lib", "mix.exs" | extras()],
       licenses: ["Apache 2.0"],
       links: %{
         "Docs" => "https://hexdocs.pm/alembic",

@@ -4,8 +4,8 @@ defmodule Alembic.ToEctoSchema do
   an `Ecto.Schema.t` struct.
   """
 
-  alias Alembic.Resource
-  alias Alembic.ToParams
+  alias Alembic.{Resource, ToParams}
+  alias Ecto.Changeset
 
   # Types
 
@@ -51,10 +51,8 @@ defmodule Alembic.ToEctoSchema do
   # Functions
 
   @spec to_ecto_schema(ToParams.params, ecto_schema_module) :: struct
-  # prefer to keep Ecto.Changeset instead of Changeset
-  @lint {Credo.Check.Design.AliasUsage, false}
   def to_ecto_schema(params, ecto_schema_module) when is_atom(ecto_schema_module) do
-    changeset = Ecto.Changeset.cast(ecto_schema_module.__struct__, params, ecto_schema_module.__schema__(:fields))
+    changeset = Changeset.cast(ecto_schema_module.__struct__, params, ecto_schema_module.__schema__(:fields))
 
     field_struct = struct(ecto_schema_module, changeset.changes)
 

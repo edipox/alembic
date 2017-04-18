@@ -3,35 +3,60 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v3.0.0](#v300)
+  - [v3.2.0](#v320)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
+  - [v3.1.1](#v311)
+    - [Bug Fixes](#bug-fixes-1)
+  - [v3.1.0](#v310)
+    - [Enhancements](#enhancements-1)
+    - [Bug Fixes](#bug-fixes-2)
+  - [v3.0.0](#v300)
+    - [Enhancements](#enhancements-2)
+    - [Bug Fixes](#bug-fixes-3)
     - [Incompatible Changes](#incompatible-changes)
   - [v2.4.0](#v240)
-    - [Enhancements](#enhancements-1)
-  - [v2.3.0](#v230)
-    - [Enhancements](#enhancements-2)
-    - [Bug Fixes](#bug-fixes-1)
-  - [v2.2.0](#v220)
     - [Enhancements](#enhancements-3)
-  - [v2.1.1](#v211)
-    - [Bug Fixes](#bug-fixes-2)
-  - [v2.1.0](#v210)
+  - [v2.3.0](#v230)
     - [Enhancements](#enhancements-4)
-    - [Bug Fixes](#bug-fixes-3)
-  - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-4)
-  - [v2.0.0](#v200)
+  - [v2.2.0](#v220)
     - [Enhancements](#enhancements-5)
+  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-5)
+  - [v2.1.0](#v210)
+    - [Enhancements](#enhancements-6)
+    - [Bug Fixes](#bug-fixes-6)
+  - [v2.0.1](#v201)
+    - [Bug Fixes](#bug-fixes-7)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-7)
+    - [Bug Fixes](#bug-fixes-8)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-6)
+    - [Enhancements](#enhancements-8)
     - [Incompatible Changes](#incompatible-changes-2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v3.2.0
+
+### Enhancements
+* [#42](https://github.com/C-S-D/alembic/pull/42) - [@KronicDeth](https://github.com/KronicDeth)
+  * Switch from `coverex` to `excoveralls`, so coverage data can be published to Coveralls.io.
+  * Update dependencies
+    * `ex_doc` to `0.15.1`
+    * `inch_ex` to `0.5.6`
+    *  `ecto` to `2.1.4`
+    * `junit_formatter` to `1.3.0`
+    * `credo` to `0.7.3`
+  * Allow `poison` to include `~> 3.0`
+
+### Bug Fixes
+* [#42](https://github.com/C-S-D/alembic/pull/42) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix Elixir 1.4 warnings
 
 ## v3.1.1
 
@@ -59,12 +84,12 @@
     * `inch_ex` to `0.5.5`
     * `junit_formatter` to `1.1.0`
   * Build with Erlang 19.1 and Elixir 1.3.4 on CircleCI.
- 
+
 ### Bug Fixes
 * [#39](https://github.com/C-S-D/alembic/pull/39) - [@KronicDeth](https://github.com/KronicDeth)
   * Ecto 2.1 makes the warning about `cast/4` instead of `cast/3` noisy, but Ecto 1.X had the opposite warning to use `cast/4` instead of `cast/3`, so use `cast/3`.
   * Fix all Erlang 19.1 dialyzer warnings.
-  
+
 ### Incompatible Changes
 * [#39](https://github.com/C-S-D/alembic/pull/39) - Drop Ecto 1.0 since Ecto 1.0's `cast/3` is different than Ecto 2.0's `cast/3.` - [@KronicDeth](https://github.com/KronicDeth)
 
@@ -83,7 +108,7 @@
   * Update `ecto` to `2.0.5`
   * Update `hackney` to `1.6.1`
   * Update `httpoison` to `0.9.1`
-  * Update `inch_ex` to `0.5.4` 
+  * Update `inch_ex` to `0.5.4`
   * Update `junit_formatter` to `1.1.0`
     * JUnit output location changed from `_build/test/test-junit-report.xml` to `_build/test/lib/alembic/test-junit-report.xml`
 
@@ -97,7 +122,7 @@
   - Update `ex_doc` to `0.12.0`
   - Update `credo` to `0.4.5`
   - Update `ecto` to `2.0.2`.  Compatibility range is changed from `~> 1.1` to `~> 1.1 or ~> 2.0`, so no incompatibility is introduced for runtime dependencies.
-  
+
 ## v2.1.1
 
 ### Bug Fixes
@@ -148,12 +173,12 @@
   * `Pagination` can store the `first`, `last`, `next`, and `previous` `Pagination.Page`s
   * `Document.to_pagination` will extract the `first`, `last`, and `next`, and `previous` `Pagination.Page` from the `"first"`, `"last"`, `"next"`, and `"prev"` top-level `links`.  The `total_size` will be extracted from the top-level `meta` `"record_count"`.  This gives compatibility with the paged paginator in `JSONAPI::Resources` with `config.top_level_meta_include_record_count = true`.
 * [#18](https://github.com/C-S-D/alembic/pull/18) - Document.error_status_consensus - [@KronicDeth](https://github.com/KronicDeth)
-  * `Document.error_status_consensus(document :: Document.t) :: String.t` returns the consensus `Error.t` `status` for all the `errors` in the `document`.  If there are no errors or statuses, then it is `nil`; otherwise, the consensus is the status shared between all (non-`nil`) errors or the max 100s status.  For example, `"404"` and `"422"` would have a consensus of `"400"` because `400` covers both errors.  For `"404"` and `"500"` the consensus would be `"500"` because `"500"` is more serious than any 4XX error.  
+  * `Document.error_status_consensus(document :: Document.t) :: String.t` returns the consensus `Error.t` `status` for all the `errors` in the `document`.  If there are no errors or statuses, then it is `nil`; otherwise, the consensus is the status shared between all (non-`nil`) errors or the max 100s status.  For example, `"404"` and `"422"` would have a consensus of `"400"` because `400` covers both errors.  For `"404"` and `"500"` the consensus would be `"500"` because `"500"` is more serious than any 4XX error.
 * [#20](https://github.com/C-S-D/alembic/pull/20) - Indirect relationships - [@KronicDeth](https://github.com/KronicDeth)
   * `ToEctoSchema.to_ecto_schema(params, module)` recursively converts nested params to the associated structs
   * `Fetch.Includes.to_string` will take a list of includes and convert it back to the common-separated string format used by JSONAPI query parameters.
 * [#23](https://github.com/C-S-D/alembic/pull/23) - Allow Poison ~> 1.5 or ~> 2.0 - [@KronicDeth](https://github.com/KronicDeth)
-  * Allow compatibility with projects that haven't upgraded to Poison 2.0. Nothing in the `Poison.Encoder` implementations is 2.0 specific, so allow both major versions.  
+  * Allow compatibility with projects that haven't upgraded to Poison 2.0. Nothing in the `Poison.Encoder` implementations is 2.0 specific, so allow both major versions.
 
 ### Bug Fixes
 * [#10](https://github.com/C-S-D/alembic/pull/10) - `ToEctoSchema` and `ToParams` - [@KronicDeth](https://github.com/KronicDeth)
@@ -188,7 +213,7 @@
     * `ResourceLinkage`
 
 ## v1.0.0
- 
+
 ### Enhancements
 * [#1](https://github.com/C-S-D/alembic/pull/1) - [@KronicDeth](https://github.com/KronicDeth)
   * CircleCI build setup
@@ -216,7 +241,7 @@
   * `Alembic.Relationships`
   * `Alembic.Resource`
   * `Alembic.Document` can parse `from_json`, represent, and encode with `Poison.encode` all document format, including `data` and `meta`, in addition to the prior support for `errors`
-  * `assert_idempotent` is defined in a module, `Alembic.FromJsonCase` under `test/support`, so it's no longer necessary to run `mix test <file> test/interpreter_server/api/from_json_test.exs` to get access to `assert_idempotent` in `<file>`.  
+  * `assert_idempotent` is defined in a module, `Alembic.FromJsonCase` under `test/support`, so it's no longer necessary to run `mix test <file> test/interpreter_server/api/from_json_test.exs` to get access to `assert_idempotent` in `<file>`.
 
 ### Incompatible Changes
 * [#8](https://github.com/C-S-D/alembic/pull/8) - JSON API (non-errors) Documents - [@KronicDeth](https://github.com/KronicDeth)

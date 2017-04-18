@@ -3,23 +3,11 @@ defmodule Alembic.Source do
   The `source` of an error.
   """
 
-  alias Alembic
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
+  alias Alembic.{Document, Error, FromJson}
 
   # Behaviours
 
   @behaviour FromJson
-
-  # Constants
-
-  @parameter_options %{
-                       field: :parameter,
-                       member: %{
-                         from_json: &FromJson.string_from_json/2
-                       }
-                     }
 
   # Struct
 

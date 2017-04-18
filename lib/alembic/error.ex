@@ -5,10 +5,7 @@ defmodule Alembic.Error do
   JSON API document.
   """
 
-  alias Alembic.FromJson
-  alias Alembic.Links
-  alias Alembic.Meta
-  alias Alembic.Source
+  alias Alembic.{FromJson, Links, Meta, Source}
 
   # Behaviours
 

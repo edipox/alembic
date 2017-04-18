@@ -3,13 +3,7 @@ defmodule Alembic.ResourceIdentifier do
   A [JSON API Resource Identifier](http://jsonapi.org/format/#document-resource-identifier-objects).
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Meta
-  alias Alembic.Relationships
-  alias Alembic.Resource
-  alias Alembic.ToParams
+  alias Alembic.{Document, Error, FromJson, Meta, Relationships, Resource, ToParams}
 
   @behaviour FromJson
   @behaviour ToParams

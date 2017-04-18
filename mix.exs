@@ -14,17 +14,24 @@ defmodule Alembic.Mixfile do
     [
       app: :alembic,
       build_embedded: Mix.env == :prod,
-      description: description,
-      deps: deps,
-      docs: docs,
+      description: description(),
+      deps: deps(),
+      docs: docs(),
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
       name: "Alembic",
-      package: package,
+      package: package(),
+      preferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.circle": :test,
+        "coveralls.detail": :test,
+        "coveralls.html": :test,
+        "coveralls.post": :test
+      ],
       source_url: "https://github.com/C-S-D/alembic",
       start_permanent: Mix.env == :prod,
-      test_coverage: [tool: Coverex.Task],
-      version: "3.1.1"
+      test_coverage: [tool: ExCoveralls],
+      version: "3.2.0"
     ]
   end
 
@@ -42,23 +49,23 @@ defmodule Alembic.Mixfile do
   defp deps do
     [
       # static code analysis for style and consistency
-      {:credo, "~> 0.5.2", only: [:dev, :test]},
-      # test coverge tool.  Allow `--cover` option for `mix test`
-      {:coverex, "~> 1.4", only: :test},
+      {:credo, "~> 0.7.3", only: [:dev, :test]},
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
       {:earmark, "~> 1.0", only: [:dev, :test]},
       # conversion to Ecto.Schema struct
       {:ecto, "~> 2.0"},
+      # test coverge tool.  Allow `--cover` option for `mix test`
+      {:excoveralls, "~> 0.6.3", only: :test},
       # documentation generation
-      {:ex_doc, "~> 0.14.3", only: [:dev, :test]},
+      {:ex_doc, "~> 0.15.1", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI
       {:junit_formatter, "~> 1.0", only: :test},
       # JSON decode and encoding.  Protocols are implemented for Alembic.* structs
-      {:poison, "~> 1.5 or ~> 2.0"}
+      {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0"}
     ]
   end
 
@@ -72,7 +79,7 @@ defmodule Alembic.Mixfile do
 
   defp docs do
     [
-      extras: extras
+      extras: extras()
     ]
   end
 
@@ -92,7 +99,7 @@ defmodule Alembic.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs" | extras],
+      files: ["lib", "mix.exs" | extras()],
       licenses: ["Apache 2.0"],
       links: %{
         "Docs" => "https://hexdocs.pm/alembic",

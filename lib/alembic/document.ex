@@ -3,15 +3,7 @@ defmodule Alembic.Document do
   JSON API refers to the top-level JSON structure as a [document](http://jsonapi.org/format/#document-structure).
   """
 
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Links
-  alias Alembic.Meta
-  alias Alembic.Pagination
-  alias Alembic.Resource
-  alias Alembic.ResourceLinkage
-  alias Alembic.ToEctoSchema
-  alias Alembic.ToParams
+  alias Alembic.{Error, FromJson, Links, Meta, Pagination, Resource, ResourceLinkage, ToEctoSchema, ToParams}
 
   # Behaviours
 
@@ -728,7 +720,7 @@ defmodule Alembic.Document do
   def from_json(json = %{}, error_template) do
     parent = %{error_template: error_template, json: json}
 
-    child_options_list
+    child_options_list()
     |> Stream.map(&Map.put(&1, :parent, parent))
     |> Stream.map(&FromJson.from_parent_json_to_field_result/1)
     |> FromJson.reduce({:ok, %__MODULE__{}})
@@ -1764,7 +1756,7 @@ defmodule Alembic.Document do
 
   @spec child_options_list :: [map, ...]
   defp child_options_list do
-    [errors_options, included_options | @child_options_list]
+    [errors_options(), included_options() | @child_options_list]
   end
 
   @spec errors_options :: map

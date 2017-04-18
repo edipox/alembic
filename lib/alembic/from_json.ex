@@ -5,8 +5,7 @@ defmodule Alembic.FromJson do
   module to convert to its `struct`.
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
+  alias Alembic.{Document, Error}
 
   # Types
 

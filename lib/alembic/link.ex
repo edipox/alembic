@@ -3,11 +3,7 @@ defmodule Alembic.Link do
   A [link object](http://jsonapi.org/format/#document-links) represents a URL and metadata about it.
   """
 
-  alias Alembic
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Meta
+  alias Alembic.{Document, Error, FromJson, Meta}
   alias Alembic.Pagination.Page
 
   # Behaviours

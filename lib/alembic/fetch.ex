@@ -4,7 +4,7 @@ defmodule Alembic.Fetch do
   """
 
   alias Alembic.Document
-  alias __MODULE__.{Includes, Sorts}
+  alias Alembic.Fetch.{Includes, Sorts}
   alias Ecto.Query
 
   # Struct

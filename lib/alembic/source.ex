@@ -3,10 +3,7 @@ defmodule Alembic.Source do
   The `source` of an error.
   """
 
-  alias Alembic
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
+  alias Alembic.{Document, Error, FromJson}
 
   # Behaviours
 

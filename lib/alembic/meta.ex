@@ -8,9 +8,7 @@ defmodule Alembic.Meta do
   > </cite>
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
+  alias Alembic.{Document, Error, FromJson}
 
   # Behaviours
 

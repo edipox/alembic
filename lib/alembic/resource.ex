@@ -5,14 +5,7 @@ defmodule Alembic.Resource do
   [resources](http://jsonapi.org/format/#document-resource-objects) as are the members of the `included` member.
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Links
-  alias Alembic.Meta
-  alias Alembic.Relationships
-  alias Alembic.ToEctoSchema
-  alias Alembic.ToParams
+  alias Alembic.{Document, Error, FromJson, Links, Meta, Relationships, ToEctoSchema, ToParams}
 
   @behaviour FromJson
   @behaviour ToEctoSchema

@@ -7,7 +7,6 @@ defmodule Alembic.RelationshipPath do
 
   alias Alembic.Fetch.Includes
 
-
   # Types
 
   @typedoc """

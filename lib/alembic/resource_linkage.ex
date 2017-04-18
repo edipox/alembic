@@ -16,12 +16,7 @@ defmodule Alembic.ResourceLinkage do
   > </cite>
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Resource
-  alias Alembic.ResourceIdentifier
-  alias Alembic.ToParams
+  alias Alembic.{Document, Error, FromJson, Resource, ResourceIdentifier, ToParams}
 
   # Dialyzer doesn't think Enum.into will work on MapSet.new, so it doesn't think it'll return
   @dialyzer {[:no_opaque, :no_return], consistent_types?: 1}

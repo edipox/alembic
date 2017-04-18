@@ -3,15 +3,7 @@ defmodule Alembic.Document do
   JSON API refers to the top-level JSON structure as a [document](http://jsonapi.org/format/#document-structure).
   """
 
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Links
-  alias Alembic.Meta
-  alias Alembic.Pagination
-  alias Alembic.Resource
-  alias Alembic.ResourceLinkage
-  alias Alembic.ToEctoSchema
-  alias Alembic.ToParams
+  alias Alembic.{Error, FromJson, Links, Meta, Pagination, Resource, ResourceLinkage, ToEctoSchema, ToParams}
 
   # Behaviours
 

@@ -3,10 +3,7 @@ defmodule Alembic.Fetch.Includes do
   [Fetching Data > Inclusion of Related Resources](http://jsonapi.org/format/#fetching-includes)
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.RelationshipPath
+  alias Alembic.{Document, Error, FromJson, RelationshipPath}
   alias Ecto.Query
 
   # Types

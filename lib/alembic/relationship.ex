@@ -11,13 +11,7 @@ defmodule Alembic.Relationship do
   > </cite>
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Links
-  alias Alembic.Meta
-  alias Alembic.ResourceLinkage
-  alias Alembic.ToParams
+  alias Alembic.{Document, Error, FromJson, Links, Meta, ResourceLinkage, ToParams}
 
   @behaviour FromJson
   @behaviour ToParams

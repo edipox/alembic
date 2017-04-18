@@ -5,13 +5,7 @@ defmodule Alembic.DocumentTest do
 
   use ExUnit.Case, async: true
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJsonCase
-  alias Alembic.Relationship
-  alias Alembic.Resource
-  alias Alembic.ResourceIdentifier
-  alias Alembic.Source
+  alias Alembic.{Document, Error, FromJsonCase, Relationship, Resource, ResourceIdentifier, Source}
 
   # Constants
 

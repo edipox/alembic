@@ -12,11 +12,7 @@ defmodule Alembic.Relationships do
   > </cite>
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Relationship
-  alias Alembic.ToParams
+  alias Alembic.{Document, Error, FromJson, Relationship, ToParams}
 
   @behaviour FromJson
   @behaviour ToParams

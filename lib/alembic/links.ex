@@ -8,11 +8,7 @@ defmodule Alembic.Links do
   > </cite>
   """
 
-  alias Alembic.Document
-  alias Alembic.Error
-  alias Alembic.FromJson
-  alias Alembic.Link
-  alias Alembic.Pagination
+  alias Alembic.{Document, Error, FromJson, Link, Pagination}
 
   # Behaviours
 

@@ -5,9 +5,7 @@ defmodule Alembic.SourceTest do
 
   use ExUnit.Case, async: true
 
-  alias Alembic.Error
-  alias Alembic.FromJsonCase
-  alias Alembic.Source
+  alias Alembic.{Error, FromJsonCase, Source}
 
   # Tests
 

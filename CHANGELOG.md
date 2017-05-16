@@ -41,6 +41,13 @@
 
 # Changelog
 
+## v3.2.1
+
+### Bug Fixes
+* [#43](https://github.com/C-S-D/alembic/pull/43) - [@KronicDeth](https://github.com/KronicDeth)
+  * Allow `Alembic.Error.t` `source` to be `nil`
+  * Lower minimum coverage because coverage number varies from run to run.
+
 ## v3.2.0
 
 ### Enhancements

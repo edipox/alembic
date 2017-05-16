@@ -128,7 +128,7 @@ defmodule Alembic.Error do
                id: String.t | nil,
                links: Links.t | nil,
                meta: %{String.t => Alembic.json | atom} | nil,
-               source: Source.t,
+               source: Source.t | nil,
                status: String.t | nil,
                title: String.t | nil
              }

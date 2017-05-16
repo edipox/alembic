@@ -3,45 +3,55 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v3.2.0](#v320)
+  - [v3.3.0](#v330)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
-  - [v3.1.1](#v311)
-    - [Bug Fixes](#bug-fixes-1)
-  - [v3.1.0](#v310)
+  - [v3.2.0](#v320)
     - [Enhancements](#enhancements-1)
+    - [Bug Fixes](#bug-fixes-1)
+  - [v3.1.1](#v311)
     - [Bug Fixes](#bug-fixes-2)
-  - [v3.0.0](#v300)
+  - [v3.1.0](#v310)
     - [Enhancements](#enhancements-2)
     - [Bug Fixes](#bug-fixes-3)
+  - [v3.0.0](#v300)
+    - [Enhancements](#enhancements-3)
+    - [Bug Fixes](#bug-fixes-4)
     - [Incompatible Changes](#incompatible-changes)
   - [v2.4.0](#v240)
-    - [Enhancements](#enhancements-3)
-  - [v2.3.0](#v230)
     - [Enhancements](#enhancements-4)
-    - [Bug Fixes](#bug-fixes-4)
-  - [v2.2.0](#v220)
+  - [v2.3.0](#v230)
     - [Enhancements](#enhancements-5)
-  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-5)
-  - [v2.1.0](#v210)
+  - [v2.2.0](#v220)
     - [Enhancements](#enhancements-6)
+  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-6)
-  - [v2.0.1](#v201)
-    - [Bug Fixes](#bug-fixes-7)
-  - [v2.0.0](#v200)
+  - [v2.1.0](#v210)
     - [Enhancements](#enhancements-7)
+    - [Bug Fixes](#bug-fixes-7)
+  - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-8)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-8)
+    - [Bug Fixes](#bug-fixes-9)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-8)
+    - [Enhancements](#enhancements-9)
     - [Incompatible Changes](#incompatible-changes-2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
 
-## v3.2.1
+## v3.3.0
+
+### Enhancements
+* [#44](https://github.com/C-S-D/alembic/pull/44) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Alembic.Document.from_ecto_changeset/2` converts the `errors` in `ecto_changeset` to `Alembic.Error.t` in a single `Alembic.Document.t`.  Bypasses a [bug in `JaSerializer`](https://github.com/vt-elixir/ja_serializer/blob/b5d9f1da736c3a9c6b42da34d35dafb7ce93879e/lib/ja_serializer/ecto_error_serializer.ex#L73-L81) where it assumes all fields that don't end in `_id` are attribute names, which leads to association names (as opposed to their foreign key) being put under `/data/attributes`.  `Alembic.Document.from_ecto_changeset` reflects on the `Ecto.Changeset.t` `data` struct module to get the `__schema__/1` information from the `Ecto.Schema.t`.  It also assumes that if the field maps to no known attribute, association or foreign key, then the error should not have an `Alembic.Source.t` instead of defaulting to `/data/attributes`.
+  * Update `circle.yml`
+    * Erlang `19.3`
+    * Elixir `1.4.1`
 
 ### Bug Fixes
 * [#43](https://github.com/C-S-D/alembic/pull/43) - [@KronicDeth](https://github.com/KronicDeth)

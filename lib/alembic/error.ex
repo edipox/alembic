@@ -102,6 +102,21 @@ defmodule Alembic.Error do
   # Types
 
   @typedoc """
+  A single error field key in the `Ecto.Changeset.t` `:errors` `Keyword.t`
+  """
+  @type ecto_changeset_error_field :: atom
+
+  @typedoc """
+  A single error message value in the `Ecto.Changeset.t` `:errors` `Keyword.t`.
+  """
+  @type ecto_changeset_error_message :: {format :: String.t, value_by_key :: Keyword.t}
+
+  @typedoc """
+  A single error in `Ecto.Changeset.t` `:errors` `Keyword.t`
+  """
+  @type ecto_changeset_error :: {ecto_changeset_error_field :: atom, ecto_changeset_error_message}
+
+  @typedoc """
   The name of a JSON type in human-readable terms, such as `"array"` or `"object"`.
   """
   @type human_type :: String.t
@@ -154,6 +169,130 @@ defmodule Alembic.Error do
   @spec descend(t, String.t | integer) :: t
   def descend(error = %__MODULE__{source: source}, child) do
     %__MODULE__{error | source: Source.descend(source, child)}
+  end
+
+  @doc """
+  Converts an `Ecto.Changeset.t` error composed of the `field` the error occurred on and the error `message`
+
+  The `field` is converted an `Alembic.Source.t` `:pointer`.  If it cannot be converted, then the returned `t` will have
+  not `:source`.  The child part of the `:pointer` is formatted with `:format_key`.
+
+  If `field` is in `association_set` in `pointer_path_from_ecto_changeset_error_field_options`, then the `pointer` will
+  be under `/data/relationships`.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Error.from_ecto_changeset_error(
+      ...>   {:favorite_posts, {"are still associated with this entry", []}},
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      %Alembic.Error{
+        detail: "favorite-posts are still associated with this entry",
+        source: %Alembic.Source{
+          pointer: "/data/relationships/favorite-posts"
+        },
+        title: "are still associated with this entry"
+      }
+
+  If `field` is a key in `association_by_foreign_key` in `pointer_path_from_ecto_changeset_error_field_options`, then
+  the `pointer` will be under `/data/relationships`, but the child will be the name of the (formatted) association
+  instead of the foreign key field itself as JSONAPI attributes should not contain foreign keys.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Error.from_ecto_changeset_error(
+      ...>   {:designated_editor_id, {"can't be blank", [validation: :required]}},
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      %Alembic.Error{
+        detail: "designated-editor can't be blank",
+        source: %Alembic.Source{
+          pointer: "/data/relationships/designated-editor"
+        },
+        title: "can't be blank"
+      }
+
+  If `field` is in `attribute_set` in `pointer_path_from_ecto_changeset_error_field_options`, then the `pointer` will be
+  under `/data/attributes`.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Error.from_ecto_changeset_error(
+      ...>   {:first_name, {"should be at least %{count} character(s)", [count: 2, validation: :length, min: 2]}},
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      %Alembic.Error{
+        detail: "first-name should be at least 2 character(s)",
+        source: %Alembic.Source{
+          pointer: "/data/attributes/first-name"
+        },
+        title: "should be at least 2 character(s)"
+      }
+
+  If `field` is not in `association_set`, `attribute_set`, or a foreign key in `association_by_foreign_key` in
+  `pointer_path_from_ecto_changeset_error_field_options`, then the `t` `:source` will be `nil`
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Error.from_ecto_changeset_error(
+      ...>   {:favorite_flavor, {"is not allowed", []}},
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      %Alembic.Error{
+        detail: "favorite-flavor is not allowed",
+        title: "is not allowed"
+      }
+
+  """
+  @spec from_ecto_changeset_error(ecto_changeset_error, Source.pointer_path_from_ecto_changeset_error_field_options) ::
+        Error.t
+  def from_ecto_changeset_error(
+        {field, message},
+        pointer_path_from_ecto_changeset_error_field_options = %{format_key: format_key}
+      ) do
+    title = title_from_ecto_changeset_error_message(message)
+
+    field
+    |> Source.pointer_path_from_ecto_changeset_error_field(pointer_path_from_ecto_changeset_error_field_options)
+    |> case do
+         {:ok, {parent, child}} ->
+           %__MODULE__{
+             detail: "#{child} #{title}",
+             source: %Source{
+               pointer: "#{parent}/#{child}"
+             },
+             title: title
+           }
+         :error ->
+           %__MODULE__{
+             detail: "#{format_key.(field)} #{title}",
+             title: title
+           }
+       end
   end
 
   @doc """
@@ -427,6 +566,21 @@ defmodule Alembic.Error do
       source: source,
       title: "Unknown relationship path"
     }
+  end
+
+  @doc """
+  Fills in the `format` of the error message using the values for the format keys in `value_by_key`
+  """
+  @spec title_from_ecto_changeset_error_message(ecto_changeset_error_message) :: String.t
+  def title_from_ecto_changeset_error_message({format, value_by_key}) do
+    # See https://github.com/elixir-ecto/ecto/blob/34a1012dd1f6d218c0183deb512b6c084afe3b6f/
+    #     lib/ecto/changeset.ex#L1836-L1838
+    Enum.reduce value_by_key, format, fn {key, value}, acc ->
+      case key do
+        :type -> acc
+        _ -> String.replace(acc, "%{#{key}}", to_string(value))
+      end
+    end
   end
 
   @doc """

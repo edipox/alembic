@@ -3,7 +3,7 @@ defmodule Alembic.Document do
   JSON API refers to the top-level JSON structure as a [document](http://jsonapi.org/format/#document-structure).
   """
 
-  alias Alembic.{Error, FromJson, Links, Meta, Pagination, Resource, ResourceLinkage, ToEctoSchema, ToParams}
+  alias Alembic.{Error, FromJson, Links, Meta, Pagination, Resource, ResourceLinkage, Source, ToEctoSchema, ToParams}
 
   # Behaviours
 
@@ -253,6 +253,112 @@ defmodule Alembic.Document do
         max_block_integer = max(status_block_integer, consensus_block_integer)
         to_string(max_block_integer * 100)
     end
+  end
+
+  @doc """
+  Converts the `errors` in `ecto_changeset` to `Alembic.Error.t` in a single `t`.
+
+  If only `:format_key` is given in the `options`, then the other keys for
+  `Alembic.Source.pointer_path_from_ecto_changeset_error_field_options` will be derived from the `ecto_schema_module` of
+  the `changeset` `:data`.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Document.from_ecto_changeset(
+      ...>   %Ecto.Changeset{
+      ...>     data: %Alembic.TestAuthor{id: 1},
+      ...>     errors: [
+      ...>       {:name, {"should be at least %{count} character(s)", [count: 2, validation: :length, min: 2]}},
+      ...>       {:posts, {"are still associated with this entry", []}}
+      ...>     ]
+      ...>   },
+      ...>   %{format_key: format_key}
+      ...> )
+      %Alembic.Document{
+        errors: [
+          %Alembic.Error{
+            detail: "name should be at least 2 character(s)",
+            source: %Alembic.Source{
+              pointer: "/data/attributes/name"
+            },
+            title: "should be at least 2 character(s)"
+          },
+          %Alembic.Error{
+            detail: "posts are still associated with this entry",
+            source: %Alembic.Source{
+              pointer: "/data/relationships/posts"
+            },
+            title: "are still associated with this entry"
+          }
+        ]
+      }
+
+  If the `ecto_changeset` `data` is not an `Ecto.Schema.t` struct and `__schema__/1` reflection functions are not
+  supported, then you can bypass the reflection by giving the
+  `Alembic.Source.pointer_path_from_ecto_changeset_error_field_options` explicitly
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Document.from_ecto_changeset(
+      ...>   %Ecto.Changeset{
+      ...>     data: %{id: 1},
+      ...>     errors: [
+      ...>       {:name, {"should be at least %{count} character(s)", [count: 2, validation: :length, min: 2]}},
+      ...>       {:posts, {"are still associated with this entry", []}}
+      ...>     ]
+      ...>   },
+      ...>   %{
+      ...>     association_set: MapSet.new([:posts]),
+      ...>     association_by_foreign_key: %{},
+      ...>     attribute_set: MapSet.new([:name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      %Alembic.Document{
+        errors: [
+          %Alembic.Error{
+            detail: "name should be at least 2 character(s)",
+            source: %Alembic.Source{
+              pointer: "/data/attributes/name"
+            },
+            title: "should be at least 2 character(s)"
+          },
+          %Alembic.Error{
+            detail: "posts are still associated with this entry",
+            source: %Alembic.Source{
+              pointer: "/data/relationships/posts"
+            },
+            title: "are still associated with this entry"
+          }
+        ]
+      }
+
+  """
+  @spec from_ecto_changeset(Ecto.Changeset.t, Source.pointer_path_from_ecto_changeset_error_field_options) :: t
+  def from_ecto_changeset(
+        %Ecto.Changeset{errors: errors},
+        options = %{association_set: _, association_by_foreign_key: _, attribute_set: _, format_key: _}
+      ) do
+    alembic_errors = Enum.map errors,
+                              &Error.from_ecto_changeset_error(&1, options)
+
+    %__MODULE__{
+      errors: alembic_errors
+    }
+  end
+
+  @spec from_ecto_changeset(Ecto.Changeset.t, %{required(:format_key) => (atom -> String.t)}) :: t
+  def from_ecto_changeset(
+        ecto_changeset = %Ecto.Changeset{data: %ecto_schema_module{}},
+        options = %{format_key: _}
+      ) do
+    full_options = Map.merge(
+      options,
+      Source.pointer_path_from_ecto_changeset_error_field_options_from_ecto_schema_module(ecto_schema_module)
+    )
+    from_ecto_changeset(ecto_changeset, full_options)
   end
 
   @doc """

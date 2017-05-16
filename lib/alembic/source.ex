@@ -16,6 +16,27 @@ defmodule Alembic.Source do
   # Types
 
   @typedoc """
+  A single error field key in the `Ecto.Changeset.t` `:errors` `Keyword.t`
+  """
+  @type ecto_changeset_error_field :: atom
+
+  @typedoc """
+  Options for `Alembic.Source.pointer_path_from_ecto_changeset_error_field_options`
+  """
+  @type pointer_path_from_ecto_changeset_error_field_options ::
+          %{
+            required(:association_set) => MapSet.t(atom),
+            required(:association_by_foreign_key) => %{atom => atom},
+            required(:attribute_set) => MapSet.t(atom),
+            required(:format_key) => (atom -> String.t)
+          }
+
+  @typedoc """
+  A pointer path is composed of the `parent` pointer and the final `child` name.
+  """
+  @type pointer_path :: {parent :: Api.json_pointer, child :: String.t}
+
+  @typedoc """
   An object containing references to the source of the [error](http://jsonapi.org/format/#error-objects), optionally
   including any of the following members:
 
@@ -226,6 +247,155 @@ defmodule Alembic.Source do
 
     FromJson.merge({:ok, %__MODULE__{}}, field_result)
   end
+
+  @doc """
+  Converts an `ecto_changeset_error_field` to an `Alembic.Source.pointer_path` that can be used to generate both the
+  `Alembic.Source.t` `:pointer` and `Alembic.Error.t` `:detail`
+
+  If `ecto_changeset_error_field` is in the `association_set`, then the `pointer_path` will be under
+  `/data/relationships` and the `child` `String.t` will be formatted with `format_key`, so that the expected underscore
+  and hypenation rules are followed.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Source.pointer_path_from_ecto_changeset_error_field(
+      ...>   :favorite_posts,
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      {:ok, {"/data/relationships", "favorite-posts"}}
+
+  If `ecto_changeset_error_field` is a key in `association_by_foreign_key`, then the associated association is used for
+  `child` and the parent is `/data/relationships` the same as if the `ecto_cahgneset_error_field` were directly an
+  associaton name.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Source.pointer_path_from_ecto_changeset_error_field(
+      ...>   :designated_editor_id,
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      {:ok, {"/data/relationships", "designated-editor"}}
+
+  If `ecto_changeset_error_field` is in the `attribute_set`, then the `pointer_path` will be under `/data/attributes`
+  and the `child` `String.t` will be formated with `format_key`, so that the expected underscore and hypenation rules
+  are followed.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Source.pointer_path_from_ecto_changeset_error_field(
+      ...>   :first_name,
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      {:ok, {"/data/attributes", "first-name"}}
+
+  If `ecto_changeset_error_field` is not in `association_set`, `attribute_set` or a foreign key in
+  `association_by_foreign_key`, then `:error` is returned.  Callers should treat this as indicating the error has no
+  source pointer and the `Alembic.Error.t` `:source` should be left `nil`.
+
+      iex> format_key = fn key ->
+      ...>   key |> Atom.to_string() |> String.replace("_", "-")
+      ...> end
+      iex> Alembic.Source.pointer_path_from_ecto_changeset_error_field(
+      ...>   :name,
+      ...>   %{
+      ...>     association_set: MapSet.new([:designated_editor, :favorite_posts]),
+      ...>     association_by_foreign_key: %{designated_editor_id: :designated_editor},
+      ...>     attribute_set: MapSet.new([:first_name, :last_name]),
+      ...>     format_key: format_key
+      ...>   }
+      ...> )
+      :error
+
+  """
+  @spec pointer_path_from_ecto_changeset_error_field(
+          ecto_changeset_error_field,
+          pointer_path_from_ecto_changeset_error_field_options
+        ) :: {:ok, pointer_path} | :error
+  def pointer_path_from_ecto_changeset_error_field(
+        ecto_changeset_error_field,
+        %{
+          association_set: association_set,
+          association_by_foreign_key: association_by_foreign_key,
+          attribute_set: attribute_set,
+          format_key: format_key
+        }
+      ) do
+    cond do
+      ecto_changeset_error_field in attribute_set ->
+        {:ok, {"/data/attributes", format_key.(ecto_changeset_error_field)}}
+      ecto_changeset_error_field in association_set ->
+        {:ok, {"/data/relationships", format_key.(ecto_changeset_error_field)}}
+      true ->
+        case Map.fetch(association_by_foreign_key, ecto_changeset_error_field) do
+          {:ok, association} ->
+            {:ok, {"/data/relationships", format_key.(association)}}
+          :error ->
+            :error
+        end
+    end
+  end
+
+  @doc false
+  @spec pointer_path_from_ecto_changeset_error_field_options_from_ecto_schema_module(Ecto.Schema.t) ::
+          %{
+            required(:association_set) => MapSet.t(atom),
+            required(:association_by_foreign_key) => %{atom => atom},
+            required(:attribute_set) => MapSet.t(atom)
+          }
+  def pointer_path_from_ecto_changeset_error_field_options_from_ecto_schema_module(ecto_schema_module) do
+    associations = ecto_schema_module.__schema__(:associations)
+    association_by_foreign_key = association_by_foreign_key(associations, ecto_schema_module)
+    attributes = ecto_schema_module_to_attributes(
+      ecto_schema_module,
+      associations ++ Map.keys(association_by_foreign_key)
+    )
+
+    %{
+      association_set: MapSet.new(associations),
+      association_by_foreign_key: association_by_foreign_key,
+      attribute_set: MapSet.new(attributes)
+    }
+  end
+
+  ## Private Functions
+
+  defp association_by_foreign_key(associations, ecto_schema_module) do
+    Enum.reduce associations, %{}, fn association, acc ->
+      case ecto_schema_module.__schema__(:association, association) do
+        %Ecto.Association.BelongsTo{owner_key: foreign_key} ->
+          Map.put(acc, foreign_key, association)
+        _ ->
+          acc
+      end
+    end
+  end
+
+  defp ecto_schema_module_to_attributes(ecto_schema_module, exclusions) do
+    # ecto_schema_module.__schema__(:fields) does not include virtual fields, so
+    # deduce real and virtual fields from struct keys
+    keys = ecto_schema_module.__struct__() |> Map.keys()
+    keys -- [:__meta__, :__struct__ | exclusions]
+  end
+
+  # Implementations
 
   defimpl Poison.Encoder do
     alias Alembic.Source

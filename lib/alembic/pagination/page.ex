@@ -49,6 +49,27 @@ defmodule Alembic.Pagination.Page do
   end
 
   @doc """
+  `t` for `Alembic.Pagination.t` `first`
+
+  There is always a `first` `t` with `number` `1`.
+
+      iex> Alembic.Pagination.Page.first(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 2,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 1,
+        size: 10
+      }
+
+  """
+  @spec first(t, %{optional(:count) => pos_integer}) :: t
+  def first(%__MODULE__{size: size}, _), do: %__MODULE__{number: 1, size: size}
+
+  @doc """
   Extracts `number` from `query` `"page[number]"` and and `size` from `query` `"page[size]"`.
 
       iex> Alembic.Pagination.Page.from_query("page%5Bnumber%5D=2&page%5Bsize%5D=10")

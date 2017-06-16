@@ -212,6 +212,70 @@ defmodule Alembic.Pagination.Page do
   def next(_, _), do: nil
 
   @doc """
+  `t` for `Alembic.Pagination.t` `previous`.
+
+  ## Single page
+
+  When there is only one page, the last page is also the first page, so previous page is `nil`.
+
+      iex> Alembic.Pagination.Page.previous(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 1,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 1}
+      ...> )
+      nil
+
+  ## Multiple Pages
+
+  When there are multiple pages, the first page has no previous page, so it is `nil`.
+
+      iex> Alembic.Pagination.Page.previous(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 1,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      nil
+
+  Any middle page will have the previous page with `number - 1`.
+
+      iex> Alembic.Pagination.Page.previous(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 2,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 1,
+        size: 10
+      }
+
+  The last page will also have previous page the same as a middle page.
+
+      iex> Alembic.Pagination.Page.previous(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 3,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 2,
+        size: 10
+      }
+
+  """
+  @spec previous(t, %{optional(:count) => pos_integer}) :: t | nil
+  def previous(%__MODULE__{number: number, size: size}, _) when number > 1 do
+    %__MODULE__{number: number - 1, size: size}
+  end
+  def previous(_, _), do: nil
+
+  @doc """
   Converts the `page` back to params.
 
       iex> Alembic.Pagination.Page.to_params(%Alembic.Pagination.Page{number: 2, size: 10})

@@ -126,6 +126,27 @@ defmodule Alembic.Pagination.Page do
   def from_uri(%URI{query: query}), do: from_query(query)
 
   @doc """
+  `t` for `Alembic.Pagination.t` `last`
+
+  There is always `last` `Alembic.Pagination.Page.t` with `number` `count`.
+
+      iex> Alembic.Pagination.Page.last(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 1,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 2}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 2,
+        size: 10
+      }
+
+  """
+  @spec last(t, %{required(:count) => pos_integer}) :: t
+  def last(%__MODULE_{size: size}, %{count: count}), do: %__MODULE__{number: count, size: size}
+
+  @doc """
   Converts the `page` back to params.
 
       iex> Alembic.Pagination.Page.to_params(%Alembic.Pagination.Page{number: 2, size: 10})

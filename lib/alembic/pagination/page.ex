@@ -147,6 +147,71 @@ defmodule Alembic.Pagination.Page do
   def last(%__MODULE_{size: size}, %{count: count}), do: %__MODULE__{number: count, size: size}
 
   @doc """
+  `t` for `Alembic.Pagination.t` `next`
+
+  ## Single page
+
+  When there is only one page, the first page is also the last page, so `next` is `nil`.
+
+      iex> Alembic.Pagination.Page.next(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 1,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 1}
+      ...> )
+      nil
+
+  ## Multiple Pages
+
+  When there are multiple pages, the first page has the second page, with `number` `2`, as its next page.
+
+      iex> Alembic.Pagination.Page.next(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 1,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 2,
+        size: 10
+      }
+
+  Any middle page will also have a next page with `number + 1`
+
+      iex> Alembic.Pagination.Page.next(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 2,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      %Alembic.Pagination.Page{
+        number: 3,
+        size: 10
+      }
+
+  The last page is the only page that will have a next page.
+
+      iex> Alembic.Pagination.Page.next(
+      ...>   %Alembic.Pagination.Page{
+      ...>     number: 3,
+      ...>     size: 10
+      ...>   },
+      ...>   %{count: 3}
+      ...> )
+      nil
+
+  """
+  @spec next(t, %{required(:count) => pos_integer}) :: t | nil
+  # when not last page (or beyond)
+  def next(%__MODULE__{number: number, size: size}, %{count: count}) when number < count do
+    %__MODULE__{number: number + 1, size: size}
+  end
+  def next(_, _), do: nil
+
+  @doc """
   Converts the `page` back to params.
 
       iex> Alembic.Pagination.Page.to_params(%Alembic.Pagination.Page{number: 2, size: 10})

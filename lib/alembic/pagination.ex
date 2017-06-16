@@ -30,8 +30,8 @@ defmodule Alembic.Pagination do
   @type t :: %__MODULE__{
                first: Page.t,
                last: Page.t,
-               next: Page.t,
-               previous: Page.t,
+               next: Page.t | nil,
+               previous: Page.t | nil,
                total_size: non_neg_integer
              }
 

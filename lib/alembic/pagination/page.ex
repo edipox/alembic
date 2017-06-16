@@ -22,6 +22,33 @@ defmodule Alembic.Pagination.Page do
   # Functions
 
   @doc """
+  The number of pages of `size` when there are `total_size` resources to be paginated.
+
+  If there are no resources (`total_size` is `0`), then there will still be 1 page
+
+      iex> Alembic.Pagination.Page.count(%{size: 10, total_size: 0})
+      1
+
+  The number of pages is always rounded up since a partial page still needs to be returned
+
+      iex> Alembic.Pagination.Page.count(%{size: 10, total_size: 10})
+      1
+      iex> Alembic.Pagination.Page.count(%{size: 10, total_size: 1})
+      1
+      iex> Alembic.Pagination.Page.count(%{size: 10, total_size: 11})
+      2
+
+  """
+  @spec count(%{size: pos_integer, total_size: non_neg_integer}) :: pos_integer
+  def count(%{size: _, total_size: 0}), do: 1
+  def count(%{size: size, total_size: total_size}) do
+    total_size
+    |> Kernel./(size)
+    |> Float.ceil()
+    |> round()
+  end
+
+  @doc """
   Extracts `number` from `query` `"page[number]"` and and `size` from `query` `"page[size]"`.
 
       iex> Alembic.Pagination.Page.from_query("page%5Bnumber%5D=2&page%5Bsize%5D=10")

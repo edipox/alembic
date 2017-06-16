@@ -3,6 +3,8 @@ defmodule Alembic.Pagination.Page do
   A page using paged pagination where the size of pages is fixed.
   """
 
+  alias Alembic.{Document, Error, Pagination}
+
   # Struct
 
   defstruct number: 1,
@@ -274,6 +276,230 @@ defmodule Alembic.Pagination.Page do
     %__MODULE__{number: number - 1, size: size}
   end
   def previous(_, _), do: nil
+
+  @doc """
+  `Alembic.Pagination.t` for pages around `page`.
+
+  ## Single Page
+
+  When there is only one page, `first` and `last` will be set to a `t`, but `next` or `previous` will be `nil`.
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 1, size: 10},
+      ...>   %{total_size: 5}
+      ...> )
+      {
+        :ok,
+        %Alembic.Pagination{
+          first: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          last: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          total_size: 5
+        }
+      }
+
+  ### No entries
+
+  If `total_size` is `0`, then there will still be 1 page, but it will be empty
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 1, size: 10},
+      ...>   %{total_size: 0}
+      ...> )
+      {
+        :ok,
+        %Alembic.Pagination{
+          first: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          last: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          total_size: 0
+        }
+      }
+
+  ## Multiple Pages
+
+  When there are multiple pages, every page will have `first` and `last` set to a `t`.
+
+  On the first page, the `next` field will set, but not the `previous` field.
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 1, size: 10},
+      ...>   %{total_size: 25}
+      ...> )
+      {
+        :ok,
+        %Alembic.Pagination{
+          first: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          last: %Alembic.Pagination.Page{
+            number: 3,
+            size: 10
+          },
+          next: %Alembic.Pagination.Page{
+            number: 2,
+            size: 10
+          },
+          total_size: 25
+        }
+      }
+
+  On any middle page, both the `next` and `previous` fields will be set.
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 2, size: 10},
+      ...>   %{total_size: 25}
+      ...> )
+      {
+        :ok,
+        %Alembic.Pagination{
+          first: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          last: %Alembic.Pagination.Page{
+            number: 3,
+            size: 10
+          },
+          next: %Alembic.Pagination.Page{
+            number: 3,
+            size: 10
+          },
+          previous: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          total_size: 25
+        }
+      }
+
+  On the last page, the `previous` field will be set, but not the `next` field.
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 3, size: 10},
+      ...>   %{total_size: 25}
+      ...> )
+      {
+        :ok,
+        %Alembic.Pagination{
+          first: %Alembic.Pagination.Page{
+            number: 1,
+            size: 10
+          },
+          last: %Alembic.Pagination.Page{
+            number: 3,
+            size: 10
+          },
+          previous: %Alembic.Pagination.Page{
+            number: 2,
+            size: 10
+          },
+          total_size: 25
+        }
+      }
+
+  ## Out-of-range
+
+  If a page number is too high an error will be returned.
+
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 2, size: 10},
+      ...>   %{total_size: 0}
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "Page number (2) must be between 1 and the page count (1)",
+              meta: %{
+                "count" => 1,
+                "number" => 2
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Page number must be between 1 and the page count"
+            }
+          ]
+        }
+      }
+      iex> Alembic.Pagination.Page.to_pagination(
+      ...>   %Alembic.Pagination.Page{number: 4, size: 10},
+      ...>   %{total_size: 15}
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "Page number (4) must be between 1 and the page count (2)",
+              meta: %{
+                "count" => 2,
+                "number" => 4
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Page number must be between 1 and the page count"
+            }
+          ]
+        }
+      }
+
+  """
+  @spec to_pagination(t, %{total_size: non_neg_integer}) :: {:ok, Pagination.t} | {:error, Document.t}
+  def to_pagination(page = %__MODULE__{number: number, size: size}, %{total_size: total_size}) do
+    count = count(%{size: size, total_size: total_size})
+
+    if number > count do
+      {
+        :error,
+        %Document{
+          errors: [
+            %Error{
+              detail: "Page number (#{number}) must be between 1 and the page count (#{count})",
+              meta: %{
+                "count" => count,
+                "number" => number
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Page number must be between 1 and the page count"
+            }
+          ]
+        }
+      }
+    else
+      options = %{count: count}
+
+      {
+        :ok,
+        %Pagination{
+          first: first(page, options),
+          last: last(page, options),
+          next: next(page, options),
+          previous: previous(page, options),
+          total_size: total_size,
+        }
+      }
+    end
+  end
 
   @doc """
   Converts the `page` back to params.

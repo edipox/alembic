@@ -17,7 +17,7 @@ defmodule Alembic.Pagination.Page do
   * `size` - the size of this page and all pages
   """
   @type t :: %__MODULE__{
-               number: non_neg_integer,
+               number: pos_integer,
                size: pos_integer
              }
 

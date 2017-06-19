@@ -5,7 +5,7 @@ defmodule Alembic.FromJson do
   module to convert to its `struct`.
   """
 
-  alias Alembic.{Document, Error, Source}
+  alias Alembic.{Document, Error}
 
   # Types
 
@@ -403,6 +403,70 @@ defmodule Alembic.FromJson do
         ]
       )
     }
+  end
+
+  @doc """
+  Ensures `integer` is positive.
+
+  If greater than 0, then it's ok
+
+      iex> Alembic.FromJson.integer_to_positive_integer(
+      ...>   1,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {:ok, 1}
+
+  If it's 0, then it's a type error
+
+      iex> Alembic.FromJson.integer_to_positive_integer(
+      ...>   0,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/number` type is not positive integer",
+              meta: %{
+                "type" => "positive integer"
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  """
+  @spec integer_to_positive_integer(0, Error.t) :: error
+  @spec integer_to_positive_integer(neg_integer, Error.t) :: error
+  @spec integer_to_positive_integer(pos_integer, Error.t) :: {:ok, pos_integer}
+  def integer_to_positive_integer(integer, error_template) when is_integer(integer) do
+    if integer > 0 do
+      {:ok, integer}
+    else
+      {
+        :error,
+        struct!(
+          Document,
+          errors: [
+            Error.type(error_template, "positive integer")
+          ]
+        )
+      }
+    end
   end
 
   @doc """

@@ -3,7 +3,38 @@ defmodule Alembic.Pagination.Page do
   A page using paged pagination where the size of pages is fixed.
   """
 
-  alias Alembic.{Document, Error, Pagination}
+  alias Alembic.{Document, Error, FromJson, Pagination, Source}
+
+  # Constants
+
+  @error_template %Error{
+    source: %Source{
+      pointer: "/page"
+    }
+  }
+
+  @number_options %{
+    field: :number,
+    member: %{
+      from_json: &__MODULE__.positive_integer_from_params/2,
+      name: "number",
+      required: true
+    }
+  }
+
+  @size_options %{
+    field: :size,
+    member: %{
+      from_json: &__MODULE__.positive_integer_from_params/2,
+      name: "size",
+      required: true
+    }
+  }
+
+  @page_child_options_list [
+    @number_options,
+    @size_options
+  ]
 
   # Struct
 
@@ -70,6 +101,207 @@ defmodule Alembic.Pagination.Page do
   """
   @spec first(t, %{optional(:count) => pos_integer}) :: t
   def first(%__MODULE__{size: size}, _), do: %__MODULE__{number: 1, size: size}
+
+  @doc """
+  Parses `t` out of `params`
+
+  ## No pagination
+
+  If there is no `"page"` key, then there is no pagination.
+
+      iex> Alembic.Pagination.Page.from_params(%{})
+      {:ok, nil}
+
+  ## Pagination
+
+  If there is a "page" key with `"number"` and `"size"` children, then there is pagination.
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "number" => 1,
+      ...>       "size" => 2
+      ...>     }
+      ...>   }
+      ...> )
+      {:ok, %Alembic.Pagination.Page{number: 1, size: 2}}
+
+  In addition to be decoded JSON, the params can also be the raw `%{String.t => String.t}` and the quoted integers will
+  be decoded.
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "number" => "1",
+      ...>       "size" => "2"
+      ...>     }
+      ...>   }
+      ...> )
+      {:ok, %Alembic.Pagination.Page{number: 1, size: 2}}
+
+  ## Errors
+
+  A page number can't be given as the `"page"` parameter alone because no default page size is assumed.
+
+      iex> Alembic.Pagination.Page.from_params(%{"page" => 1})
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page` type is not object",
+              meta: %{
+                "type" => "object"
+              },
+              source: %Alembic.Source{
+                pointer: "/page"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  ### Required parameters
+
+  Likewise, the `"page"` map can't have only a `"number"` parameter because no default page size is assumed.
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "number" => 1
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/size` is missing",
+              meta: %{
+                "child" => "size"
+              },
+              source: %Alembic.Source{
+                pointer: "/page"
+              },
+              status: "422",
+              title: "Child missing"
+            }
+          ]
+        }
+      }
+
+  The page number is not assumed to be 1 when not given.
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "size" => 10
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/number` is missing",
+              meta: %{
+                "child" => "number"
+              },
+              source: %Alembic.Source{
+                pointer: "/page"
+              },
+              status: "422",
+              title: "Child missing"
+            }
+          ]
+        }
+      }
+
+  ### Number format
+
+  `"page"` `"number"` must be a positive integer.  It is 1-based.  The first page is `"1"`
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "number" => 0,
+      ...>       "size" => 10
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/number` type is not positive integer",
+              meta: %{
+                "type" => "positive integer"
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  ### Size format
+
+  `"page"` `"size"` must be a positive integer.
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{
+      ...>     "page" => %{
+      ...>       "number" => 1,
+      ...>       "size" => 0
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/size` type is not positive integer",
+              meta: %{
+                "type" => "positive integer"
+              },
+              source: %Alembic.Source{
+                pointer: "/page/size"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  """
+
+  def from_params(%{"page" => page}) when is_map(page) do
+    parent = %{
+      error_template: @error_template,
+      json: page
+    }
+
+    @page_child_options_list
+    |> Stream.map(&Map.put(&1, :parent, parent))
+    |> Stream.map(&FromJson.from_parent_json_to_field_result/1)
+    |> FromJson.reduce({:ok, %__MODULE__{}})
+  end
+
+  def from_params(%{"page" => page}) when not is_map(page) do
+    {:error, %Document{errors: [Error.type(@error_template, "object")]}}
+  end
+
+  def from_params(params) when is_map(params), do: {:ok, nil}
 
   @doc """
   Extracts `number` from `query` `"page[number]"` and and `size` from `query` `"page[size]"`.
@@ -212,6 +444,13 @@ defmodule Alembic.Pagination.Page do
     %__MODULE__{number: number + 1, size: size}
   end
   def next(_, _), do: nil
+
+  @doc false
+  def positive_integer_from_params(child, error_template) do
+    with {:ok, integer} <- integer_from_params(child, error_template) do
+      FromJson.integer_to_positive_integer(integer, error_template)
+    end
+  end
 
   @doc """
   `t` for `Alembic.Pagination.t` `previous`.
@@ -537,6 +776,62 @@ defmodule Alembic.Pagination.Page do
   end
 
   ## Private Functions
+
+  defp integer_from_params(
+         quoted_integer,
+         error_template = %Error{
+           source: source = %Source{
+             pointer: pointer
+           }
+         }
+       ) when is_binary(quoted_integer) do
+    case Integer.parse(quoted_integer) do
+      :error ->
+        {
+          :error,
+          %Document{
+            errors: [
+              Error.type(error_template, "quoted integer")
+            ]
+          }
+        }
+      {integer, ""} ->
+        {:ok, integer}
+      {integer, remainder_of_binary} ->
+        {
+          :error,
+          %Document{
+            errors: [
+              %Error{
+                detail: "`#{pointer}` contains quoted integer (`#{integer}`), " <>
+                        "but also excess text (`#{inspect remainder_of_binary}`)",
+                meta: %{
+                  excess: remainder_of_binary,
+                  integer: integer,
+                  type: "quoted integer",
+                },
+                source: source,
+                status: "422",
+                title: "Excess text in quoted integer"
+              }
+            ]
+          }
+        }
+    end
+  end
+
+  defp integer_from_params(integer, _) when is_integer(integer), do: {:ok, integer}
+
+  defp integer_from_params(_, error_template) do
+    {
+      :error,
+      %Document{
+        errors: [
+          Error.type(error_template, "integer")
+        ]
+      }
+    }
+  end
 
   defp reduce_decoded_query_to_page({"page[number]", encoded_page_number}, page = %__MODULE__{}) do
     %__MODULE__{page | number: String.to_integer(encoded_page_number)}

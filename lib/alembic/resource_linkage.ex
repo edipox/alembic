@@ -133,7 +133,6 @@ defmodule Alembic.ResourceLinkage do
         }
       }
 
-
   An empty to-one resource linkage can be signified with `nil`, which would have been `null` in the original JSON.
 
       iex> Alembic.ResourceLinkage.from_json(

@@ -139,6 +139,15 @@ defmodule Alembic.Pagination.Page do
       ...> )
       {:ok, %Alembic.Pagination.Page{number: 1, size: 2}}
 
+  ### Opt-out
+
+  Opting out of default pagination can be indicated with a `nil` page
+
+      iex> Alembic.Pagination.Page.from_params(
+      ...>   %{"page" => nil}
+      ...> )
+      {:ok, :all}
+
   ## Errors
 
   A page number can't be given as the `"page"` parameter alone because no default page size is assumed.
@@ -284,6 +293,7 @@ defmodule Alembic.Pagination.Page do
       }
 
   """
+  @spec from_params(map) :: {:ok, t} | {:ok, :all} | {:ok, nil} | {:error, Document.t}
 
   def from_params(%{"page" => page}) when is_map(page) do
     parent = %{
@@ -296,6 +306,8 @@ defmodule Alembic.Pagination.Page do
     |> Stream.map(&FromJson.from_parent_json_to_field_result/1)
     |> FromJson.reduce({:ok, %__MODULE__{}})
   end
+
+  def from_params(%{"page" => nil}), do: {:ok, :all}
 
   def from_params(%{"page" => page}) when not is_map(page) do
     {:error, %Document{errors: [Error.type(@error_template, "object")]}}
@@ -743,6 +755,8 @@ defmodule Alembic.Pagination.Page do
   @doc """
   Converts the `page` back to params.
 
+  An `Alembic.Pagination.Page.t` is converted to JSON.
+
       iex> Alembic.Pagination.Page.to_params(%Alembic.Pagination.Page{number: 2, size: 10})
       %{
         "page" => %{
@@ -751,9 +765,24 @@ defmodule Alembic.Pagination.Page do
         }
       }
 
+  The special value `:all`, which indicates that pagination should be disabled and "all" pages should be returned at
+  once goes back to a `nil` `"page"`
+
+      iex> Alembic.Pagination.Page.to_params(:all)
+      %{
+        "page" => nil
+      }
+
+  A `nil` page on the other hand, has no params at all
+
+      iex> Alembic.Pagination.Page.to_params(nil)
+      %{}
+
   """
-  @spec to_params(t) :: map
+  @spec to_params(t | :all | nil) :: map
   def to_params(page)
+  def to_params(:all), do: %{"page" => nil}
+  def to_params(nil), do: %{}
   def to_params(%__MODULE__{number: number, size: size}) do
     %{
       "page" => %{

@@ -95,7 +95,13 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -216,7 +222,12 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server}
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -252,7 +263,13 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -286,7 +303,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -320,7 +343,13 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -347,7 +376,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -373,7 +408,13 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -399,25 +440,31 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
-    {:ok, document} = Document.from_json(decoded, error_template)
-
-    assert document ==  %Document{
-      data: [
-        %ResourceIdentifier{
-          id: "2",
-          type: "tags"
-        },
-        %ResourceIdentifier{
-          id: "3",
-          type: "tags"
-        }
-      ],
-      links: %{
-        "related" => "/articles/1/tags",
-        "self" => "/articles/1/relationships/tags"
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
       }
     }
+    {:ok, document} = Document.from_json(decoded, error_template)
+
+    assert document == %Document{
+             data: [
+               %ResourceIdentifier{
+                 id: "2",
+                 type: "tags"
+               },
+               %ResourceIdentifier{
+                 id: "3",
+                 type: "tags"
+               }
+             ],
+             links: %{
+               "related" => "/articles/1/tags",
+               "self" => "/articles/1/relationships/tags"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -431,7 +478,13 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -463,7 +516,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -501,7 +560,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -535,7 +600,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -568,7 +639,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -598,7 +675,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -630,7 +713,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -667,7 +756,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -701,7 +796,13 @@ defmodule Alembic.DocumentTest do
       "data": {"type": "people", "id": "12"}
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -719,7 +820,13 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -739,7 +846,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -763,7 +876,13 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -780,7 +899,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -803,7 +928,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :delete, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :delete,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -838,7 +969,13 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -889,7 +1026,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -955,7 +1098,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1012,7 +1161,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1068,33 +1223,39 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "body" => "The shortest article. Ever.",
-            "created" => "2015-05-22T14:56:29.000Z",
-            "title" => "JSON API paints my bikeshed!",
-            "updated" => "2015-05-22T14:56:28.000Z"
-          },
-          id: "3",
-          type: "articles"
-        }
-      ],
-      links: %{
-        "first" => "http://example.com/articles?page[number]=1&page[size]=1",
-        "last" => "http://example.com/articles?page[number]=13&page[size]=1",
-        "next" => "http://example.com/articles?page[number]=4&page[size]=1",
-        "prev" => "http://example.com/articles?page[number]=2&page[size]=1",
-        "self" => "http://example.com/articles?page[number]=3&page[size]=1"
-      },
-      meta: %{
-        "total-pages" => 13
-      }
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "body" => "The shortest article. Ever.",
+                   "created" => "2015-05-22T14:56:29.000Z",
+                   "title" => "JSON API paints my bikeshed!",
+                   "updated" => "2015-05-22T14:56:28.000Z"
+                 },
+                 id: "3",
+                 type: "articles"
+               }
+             ],
+             links: %{
+               "first" => "http://example.com/articles?page[number]=1&page[size]=1",
+               "last" => "http://example.com/articles?page[number]=13&page[size]=1",
+               "next" => "http://example.com/articles?page[number]=4&page[size]=1",
+               "prev" => "http://example.com/articles?page[number]=2&page[size]=1",
+               "self" => "http://example.com/articles?page[number]=3&page[size]=1"
+             },
+             meta: %{
+               "total-pages" => 13
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -1113,7 +1274,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1156,7 +1323,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1205,7 +1378,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1256,7 +1435,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1302,7 +1487,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1327,7 +1518,13 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
@@ -1355,7 +1552,13 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{

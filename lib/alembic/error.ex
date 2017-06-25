@@ -438,8 +438,10 @@ defmodule Alembic.Error do
   @spec minimum_children(t, [String.t]) :: t
   def minimum_children(template, children)
 
-  def minimum_children(%__MODULE__{source: source = %Source{pointer: parent_pointer}},
-                       children) when is_list(children) do
+  def minimum_children(
+        %__MODULE__{source: source = %Source{pointer: parent_pointer}},
+        children
+      ) when is_list(children) do
     %__MODULE__{
       detail: "At least one of the following children of `#{parent_pointer}` must be present:\n" <>
               Enum.join(children, "\n"),
@@ -556,7 +558,14 @@ defmodule Alembic.Error do
   """
   @spec relationship_path(String.t) :: t
   @spec relationship_path(t, String.t) :: t
-  def relationship_path(template \\ %__MODULE__{source: %Source{parameter: "include"}}, unknown_relationship_path)
+  def relationship_path(
+        template \\ %__MODULE__{
+          source: %Source{
+            parameter: "include"
+          }
+        },
+        unknown_relationship_path
+      )
   def relationship_path(%__MODULE__{source: source}, unknown_relationship_path) do
     %__MODULE__{
       detail: "`#{unknown_relationship_path}` is an unknown relationship path",

@@ -1441,15 +1441,19 @@ defmodule Alembic.Document do
           ToEctoSchema.ecto_schema_module_by_type
         ) :: [struct] | struct
 
-  def to_ecto_schema(%__MODULE__{data: resource = %Resource{}},
-                     resource_by_id_by_type,
-                     ecto_schema_module_by_type) do
+  def to_ecto_schema(
+        %__MODULE__{data: resource = %Resource{}},
+        resource_by_id_by_type,
+        ecto_schema_module_by_type
+      ) do
     Resource.to_ecto_schema(resource, resource_by_id_by_type, ecto_schema_module_by_type)
   end
 
-  def to_ecto_schema(%__MODULE__{data: resources},
-                     resource_by_id_by_type,
-                     ecto_schema_module_by_type) when is_list(resources) do
+  def to_ecto_schema(
+        %__MODULE__{data: resources},
+        resource_by_id_by_type,
+        ecto_schema_module_by_type
+      ) when is_list(resources) do
     Enum.map resources, &Resource.to_ecto_schema(&1, resource_by_id_by_type, ecto_schema_module_by_type)
   end
 
@@ -1593,7 +1597,14 @@ defmodule Alembic.Document do
   """
   @spec to_pagination(t) :: Pagination.t | nil
 
-  def to_pagination(%__MODULE__{links: links, meta: %{"record_count" => total_size}}) do
+  def to_pagination(
+        %__MODULE__{
+          links: links,
+          meta: %{
+            "record_count" => total_size
+          }
+        }
+      ) do
     document_pagination = %Pagination{total_size: total_size}
 
     case Links.to_pagination(links) do

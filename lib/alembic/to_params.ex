@@ -194,10 +194,12 @@ defmodule Alembic.ToParams do
     replace_nested_with_owner(params, association_param_name, owner_key, nil)
   end
 
-  defp replace_nested(params,
-                      association_param_name,
-                      association_params,
-                      %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}) do
+  defp replace_nested(
+         params,
+         association_param_name,
+         association_params,
+         %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}
+       ) do
     case Map.fetch(association_params, to_string(related_key)) do
       {:ok, foreign_key_value} ->
         replace_nested_with_owner(params, association_param_name, owner_key, foreign_key_value)

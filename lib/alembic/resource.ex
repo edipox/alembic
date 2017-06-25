@@ -1038,9 +1038,11 @@ defmodule Alembic.Resource do
   @spec to_params(t, ToParams.resource_by_id_by_type, ToParams.converted_by_id_by_type) :: ToParams.params
   def to_params(resource, resource_by_id_by_type, converted_by_id_by_type)
 
-  def to_params(%__MODULE__{attributes: attributes, id: id, relationships: relationships, type: type},
-                resource_by_id_by_type,
-                converted_by_id_by_type) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
+  def to_params(
+        %__MODULE__{attributes: attributes, id: id, relationships: relationships, type: type},
+        resource_by_id_by_type,
+        converted_by_id_by_type
+      ) when is_map(resource_by_id_by_type) and is_map(converted_by_id_by_type) do
     case get_in(converted_by_id_by_type, [type, id]) do
       true ->
         %{"id" => id}

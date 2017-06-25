@@ -311,7 +311,14 @@ defmodule Alembic.FromJson do
           }
         ) :: field_result | error | :error
 
-  def from_parent_json_to_field_result(options = %{member: %{name: member_name, module: member_module}}) do
+  def from_parent_json_to_field_result(
+        options = %{
+          member: %{
+            name: member_name,
+            module: member_module
+          }
+        }
+      ) do
     from_parent_json_to_field_result(
       %{
         options |
@@ -323,11 +330,16 @@ defmodule Alembic.FromJson do
     )
   end
 
-  def from_parent_json_to_field_result(%{
-                                         field: field_name,
-                                         member: member = %{name: member_name, from_json: from_json},
-                                         parent: %{json: parent_json, error_template: parent_error_template}
-                                       }) do
+  def from_parent_json_to_field_result(
+        %{
+          field: field_name,
+          member: member = %{name: member_name, from_json: from_json},
+          parent: %{
+            json: parent_json,
+            error_template: parent_error_template
+          }
+        }
+      ) do
     case Map.fetch(parent_json, member_name) do
       {:ok, value_json} ->
         member_error_template = Error.descend(parent_error_template, member_name)

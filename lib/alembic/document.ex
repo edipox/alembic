@@ -1036,9 +1036,13 @@ defmodule Alembic.Document do
     %__MODULE__{
       # Don't use Enum.into as it will reverse the list immediately, which is more reversing that necessary since
       # merge is called a bunch of time in sequence.
-      errors: Enum.reduce(second_errors, first_errors, fn (second_error, acc_errors) ->
-        [second_error | acc_errors]
-      end)
+      errors: Enum.reduce(
+        second_errors,
+        first_errors,
+        fn (second_error, acc_errors) ->
+          [second_error | acc_errors]
+        end
+      )
     }
   end
 

@@ -1057,9 +1057,11 @@ defmodule Alembic.Resource do
         updated_converted_by_id_by_type = converted_by_id_by_type
                                           |> Map.put_new(type, %{})
                                           |> put_in([type, id], true)
-        relationships_params = Relationships.to_params(relationships,
-                                                       resource_by_id_by_type,
-                                                       updated_converted_by_id_by_type)
+        relationships_params = Relationships.to_params(
+          relationships,
+          resource_by_id_by_type,
+          updated_converted_by_id_by_type
+        )
         Map.merge(params, relationships_params)
     end
   end

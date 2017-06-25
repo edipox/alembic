@@ -58,9 +58,12 @@ defmodule Alembic.ToEctoSchema do
 
     :associations
     |> ecto_schema_module.__schema__
-    |> Enum.reduce(field_struct, fn (association_name, acc) ->
-         put_named_association(acc, params, ecto_schema_module, association_name)
-       end)
+    |> Enum.reduce(
+         field_struct,
+         fn (association_name, acc) ->
+           put_named_association(acc, params, ecto_schema_module, association_name)
+         end
+       )
   end
 
   @spec to_ecto_schema(%{type: Resource.type}, ToParams.params, ecto_schema_module_by_type) :: struct

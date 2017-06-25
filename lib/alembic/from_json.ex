@@ -133,9 +133,11 @@ defmodule Alembic.FromJson do
                                                                           is_function(element_from_json, 2) do
     json_array
     |> Stream.with_index
-    |> Stream.map(fn {element_json, index} ->
-         element_from_json.(element_json, Error.descend(error_template, index))
-       end)
+    |> Stream.map(
+         fn {element_json, index} ->
+           element_from_json.(element_json, Error.descend(error_template, index))
+         end
+       )
     |> reduce({:ok, []})
   end
 
@@ -305,7 +307,13 @@ defmodule Alembic.FromJson do
 
   def from_parent_json_to_field_result(options = %{member: %{name: member_name, module: member_module}}) do
     from_parent_json_to_field_result(
-      %{options | member: %{name: member_name, from_json: &member_module.from_json/2}}
+      %{
+        options |
+        member: %{
+          name: member_name,
+          from_json: &member_module.from_json/2
+        }
+      }
     )
   end
 

@@ -478,9 +478,12 @@ defmodule Alembic.ResourceLinkage do
 
   defp consistent_types?(list) when is_list(list) do
     list
-    |> Enum.into(MapSet.new, fn element ->
-          element.__struct__
-       end)
+    |> Enum.into(
+         MapSet.new,
+         fn element ->
+           element.__struct__
+         end
+       )
     |> MapSet.size == 1
   end
 

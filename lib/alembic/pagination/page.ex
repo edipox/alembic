@@ -333,8 +333,8 @@ defmodule Alembic.Pagination.Page do
   """
   @spec from_query(String.t) :: t
   def from_query(query) when is_binary(query) do
-    reduced = query |>
-              URI.query_decoder
+    reduced = query
+              |> URI.query_decoder
               |> Enum.reduce(%__MODULE__{number: :unset, size: :unset}, &reduce_decoded_query_to_page/2)
 
     case reduced do

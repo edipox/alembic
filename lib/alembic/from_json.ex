@@ -296,14 +296,20 @@ defmodule Alembic.FromJson do
 
   """
   @spec from_parent_json_to_field_result(
-    %{parent: %{json: Alembic.json_object, error_template: Error.t},
-      member: %{
-                required(:from_json) => (Alembic.json, Origin.t -> singleton_result),
-                required(:name) => String.t,
-                optional(:required) => boolean
-              } |
-              %{name: String.t, module: module},
-      field: atom}) :: field_result | error | :error
+          %{
+            parent: %{
+              json: Alembic.json_object,
+              error_template: Error.t
+            },
+            member: %{
+                      required(:from_json) => (Alembic.json, Origin.t -> singleton_result),
+                      required(:name) => String.t,
+                      optional(:required) => boolean
+                    } |
+                    %{name: String.t, module: module},
+            field: atom
+          }
+        ) :: field_result | error | :error
 
   def from_parent_json_to_field_result(options = %{member: %{name: member_name, module: member_module}}) do
     from_parent_json_to_field_result(

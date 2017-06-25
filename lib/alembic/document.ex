@@ -1435,9 +1435,11 @@ defmodule Alembic.Document do
   @doc """
   Call `to_ecto_schema/2` instead to automatically generate `attributes_by_id_by_type`
   """
-  @spec to_ecto_schema(%__MODULE__{data: [Resource.t] | Resource.t},
-                       ToParams.resource_by_id_by_type,
-                       ToEctoSchema.ecto_schema_module_by_type) :: [struct] | struct
+  @spec to_ecto_schema(
+          %__MODULE__{data: [Resource.t] | Resource.t},
+          ToParams.resource_by_id_by_type,
+          ToEctoSchema.ecto_schema_module_by_type
+        ) :: [struct] | struct
 
   def to_ecto_schema(%__MODULE__{data: resource = %Resource{}},
                      resource_by_id_by_type,
@@ -1837,8 +1839,10 @@ defmodule Alembic.Document do
 
   See `Alembic.Document.to_params/1`
   """
-  @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
-                  ToParams.resource_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          %__MODULE__{data: [Resource.t] | Resource.t | nil},
+          ToParams.resource_by_id_by_type
+        ) :: ToParams.params
   def to_params(document, resource_by_id_by_type), do: to_params(document, resource_by_id_by_type, %{})
 
   @doc """
@@ -1848,9 +1852,11 @@ defmodule Alembic.Document do
 
   See `InterpreterServer.Api.Document.to_params/1`
   """
-  @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
-                  ToParams.resource_by_id_by_type,
-                  ToParams.converted_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          %__MODULE__{data: [Resource.t] | Resource.t | nil},
+          ToParams.resource_by_id_by_type,
+          ToParams.converted_by_id_by_type
+        ) :: ToParams.params
   def to_params(%__MODULE__{data: data}, resource_by_id_by_type, converted_by_id_by_type) when is_list(data) do
     Enum.map(data, &Resource.to_params(&1, resource_by_id_by_type, converted_by_id_by_type))
   end

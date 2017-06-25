@@ -77,9 +77,11 @@ defmodule Alembic.ToParams do
   * `{:error, :already_converted}` - if the `type` and `id` of `convertable` already exists in `converted_by_id_by_type`
   * `{:error, :unset}` - if the `convertable` data is not set
   """
-  @callback to_params(convertable :: any,
-                      resource_by_id_by_type,
-                      converted_by_id_by_type) :: params | {:error, :already_converted | :unset}
+  @callback to_params(
+              convertable :: any,
+              resource_by_id_by_type,
+              converted_by_id_by_type
+            ) :: params | {:error, :already_converted | :unset}
 
   # Functions
 

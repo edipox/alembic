@@ -534,9 +534,11 @@ defmodule Alembic.Relationship do
   but unlike `to_params/2`, will skip converting data in `t` where the `type` and `id` are already in
   `converted_by_id_by_type`.
   """
-  @spec to_params(%__MODULE__{data: any},
-                  ToParams.resource_by_id_by_type,
-                  ToParams.converted_by_id_by_type) :: ToParams.params | {:error, :already_converted | :unset}
+  @spec to_params(
+          %__MODULE__{data: any},
+          ToParams.resource_by_id_by_type,
+          ToParams.converted_by_id_by_type
+        ) :: ToParams.params | {:error, :already_converted | :unset}
   def to_params(relationship, resource_by_id_by_type, converted_by_id_by_type)
 
   def to_params(%__MODULE__{data: :unset}, _, _), do: {:error, :unset}

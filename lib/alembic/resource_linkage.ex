@@ -452,13 +452,17 @@ defmodule Alembic.ResourceLinkage do
       ]
 
   """
-  @spec to_params([Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
-                  ToParams.resource_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          [Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
+          ToParams.resource_by_id_by_type
+        ) :: ToParams.params
   def to_params(resource_linkage, resource_by_id_by_type), do: to_params(resource_linkage, resource_by_id_by_type, %{})
 
-  @spec to_params([Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
-                  ToParams.resource_by_id_by_type,
-                  ToParams.converted_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          [Resource.t | ResourceIdentifier.t] | Resource.t | ResourceIdentifier.t | nil,
+          ToParams.resource_by_id_by_type,
+          ToParams.converted_by_id_by_type
+        ) :: ToParams.params
 
   def to_params(nil, %{}, %{}), do: nil
 

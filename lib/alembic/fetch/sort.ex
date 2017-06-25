@@ -130,8 +130,8 @@ defmodule Alembic.Fetch.Sort do
   # Break up `related_attribute_path` into `relationship` and `attribute` components and puts them into `sort`
   defp put_related_attribute_path(sort = %__MODULE__{}, related_attribute_path) do
     [attribute_name | reverse_relationship_names] = related_attribute_path
-                                                   |> String.split(related_attribute_path_separator())
-                                                   |> Enum.reverse()
+                                                    |> String.split(related_attribute_path_separator())
+                                                    |> Enum.reverse()
 
     relationship = reverse_relationship_names_to_include(reverse_relationship_names)
 

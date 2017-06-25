@@ -777,9 +777,9 @@ defmodule Alembic.Error do
 
     """
     def encode(error = %@for{}, options) do
-       map = for {field, value} <- Map.from_struct(error), value != nil, into: %{}, do: {field, value}
+      map = for {field, value} <- Map.from_struct(error), value != nil, into: %{}, do: {field, value}
 
-       Poison.Encoder.Map.encode(map, options)
+      Poison.Encoder.Map.encode(map, options)
     end
   end
 end

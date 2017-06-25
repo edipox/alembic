@@ -209,14 +209,14 @@ defmodule Alembic.ToParams do
   end
 
   defp replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, foreign_key_value)
-        when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
+       when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
     params
     |> Map.delete(nested_param_name)
     |> Map.put(foreign_key_param_name, foreign_key_value)
   end
 
   defp replace_nested_with_owner(params, nested_param_name, owner_key, owner_key_value)
-        when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
+       when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
     foreign_key_param_name = to_string(owner_key)
 
     replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, owner_key_value)

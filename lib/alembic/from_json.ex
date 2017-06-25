@@ -128,7 +128,7 @@ defmodule Alembic.FromJson do
   end
 
   @spec from_json_array(Alembic.json, Error.t, (Alembic.json, Error.t -> singleton_result)) ::
-        {:ok, [singleton_value]} | error
+          {:ok, [singleton_value]} | error
   def from_json_array(json_array, error_template, element_from_json) when is_list(json_array) and
                                                                           is_function(element_from_json, 2) do
     json_array

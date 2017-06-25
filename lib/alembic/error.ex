@@ -269,7 +269,7 @@ defmodule Alembic.Error do
 
   """
   @spec from_ecto_changeset_error(ecto_changeset_error, Source.pointer_path_from_ecto_changeset_error_field_options) ::
-        Error.t
+          Error.t
   def from_ecto_changeset_error(
         {field, message},
         pointer_path_from_ecto_changeset_error_field_options = %{format_key: format_key}

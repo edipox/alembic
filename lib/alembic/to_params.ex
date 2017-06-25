@@ -11,7 +11,11 @@ defmodule Alembic.ToParams do
   `Alembic.Resource.id` with the values not being present initially, but being updated to `true` once the
   `{type, id}` is converted once.
   """
-  @type converted_by_id_by_type :: %{Resource.type => %{Resource.id => boolean}}
+  @type converted_by_id_by_type :: %{
+                                     Resource.type => %{
+                                       Resource.id => boolean
+                                     }
+                                   }
 
   @typedoc """
   Params format used by [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4).
@@ -22,7 +26,11 @@ defmodule Alembic.ToParams do
   A nest map with the outer layer keyed by the `Alembic.Resource.type`, then the next layer keyed by the
   `Alembic.Resource.id` with the values being the full `Alembic.Resource.t`
   """
-  @type resource_by_id_by_type :: %{Resource.type => %{Resource.id => Resource.t}}
+  @type resource_by_id_by_type :: %{
+                                    Resource.type => %{
+                                      Resource.id => Resource.t
+                                    }
+                                  }
 
   # Callbacks
 

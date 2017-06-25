@@ -26,7 +26,9 @@ defmodule Alembic.Source do
   @type pointer_path_from_ecto_changeset_error_field_options ::
           %{
             required(:association_set) => MapSet.t(atom),
-            required(:association_by_foreign_key) => %{atom => atom},
+            required(:association_by_foreign_key) => %{
+              atom => atom
+            },
             required(:attribute_set) => MapSet.t(atom),
             required(:format_key) => (atom -> String.t)
           }

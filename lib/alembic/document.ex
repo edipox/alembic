@@ -15,46 +15,46 @@ defmodule Alembic.Document do
   # Constants
 
   @data_options %{
-                  field: :data,
-                  member: %{
-                    module: ResourceLinkage,
-                    name: "data"
-                  }
-                }
+    field: :data,
+    member: %{
+      module: ResourceLinkage,
+      name: "data"
+    }
+  }
 
   @errors_options %{
-                    field: :errors,
-                    member: %{
-                      name: "errors"
-                    }
-                  }
+    field: :errors,
+    member: %{
+      name: "errors"
+    }
+  }
 
   @included_options %{
-                      field: :included,
-                      member: %{
-                        name: "included"
-                      }
-                    }
+    field: :included,
+    member: %{
+      name: "included"
+    }
+  }
 
   @human_type "document"
 
   @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
+    field: :links,
+    member: %{
+      module: Links,
+      name: "links"
+    }
+  }
 
   @minimum_children ~w{data errors meta}
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    }
+  }
 
   # DOES NOT include `@errors_options` because `&FromJson.from_json_array(&1, &2, Error)` cannot appear in a module
   #   attribute used in a function

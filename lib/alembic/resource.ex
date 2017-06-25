@@ -16,52 +16,52 @@ defmodule Alembic.Resource do
   @attributes_human_type "json object"
 
   @attributes_options %{
-                        field: :attributes,
-                        member: %{
-                          name: "attributes"
-                        }
-                      }
+    field: :attributes,
+    member: %{
+      name: "attributes"
+    }
+  }
 
   @id_options %{
-                field: :id,
-                member: %{
-                  from_json: &FromJson.string_from_json/2,
-                  name: "id"
-                }
-              }
+    field: :id,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "id"
+    }
+  }
 
   @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
+    field: :links,
+    member: %{
+      module: Links,
+      name: "links"
+    }
+  }
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    }
+  }
 
   @relationships_options %{
-                           field: :relationships,
-                           member: %{
-                             module: Relationships,
-                             name: "relationships"
-                           }
-                         }
+    field: :relationships,
+    member: %{
+      module: Relationships,
+      name: "relationships"
+    }
+  }
 
   @type_options %{
-                  field: :type,
-                  member: %{
-                    from_json: &FromJson.string_from_json/2,
-                    name: "type",
-                    required: true
-                  }
-                }
+    field: :type,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "type",
+      required: true
+    }
+  }
 
   # DOES NOT include `@attribute_options` because it needs to be customized with private function reference
   # DOES NOT include `@id_options` because it needs to be customized based on `error_template.meta`

@@ -19,33 +19,33 @@ defmodule Alembic.Relationship do
   # Constants
 
   @data_options %{
-                  field: :data,
-                  member: %{
-                    module: ResourceLinkage,
-                    name: "data"
-                  },
-                  parent: nil
-                }
+    field: :data,
+    member: %{
+      module: ResourceLinkage,
+      name: "data"
+    },
+    parent: nil
+  }
 
   @human_type "relationship"
 
   @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   },
-                   parent: nil
-                 }
+    field: :links,
+    member: %{
+      module: Links,
+      name: "links"
+    },
+    parent: nil
+  }
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    },
+    parent: nil
+  }
   # Struct
 
   defstruct data: :unset,

@@ -65,7 +65,7 @@ defmodule Alembic.Mixfile do
       # conversion to Ecto.Schema struct
       {:ecto, "~> 2.0"},
       # test coverge tool.  Allow `--cover` option for `mix test`
-      {:excoveralls, "~> 0.6.3", only: :test},
+      {:excoveralls, "~> 0.7.0", only: :test},
       # documentation generation
       {:ex_doc, "~> 0.16.1", only: [:dev, :test]},
       # documentation coverage

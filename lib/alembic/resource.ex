@@ -131,7 +131,6 @@ defmodule Alembic.Resource do
   @doc """
   Converts a JSON object into a [JSON API Resource](http://jsonapi.org/format/#document-resource-objects), `t`.
 
-
   ## Invalid
 
   A non-resource will be matched, but return an error.
@@ -733,7 +732,6 @@ defmodule Alembic.Resource do
       }
 
   If any relationship has an error, then it will make the entire resource invalid
-
 
       iex> Alembic.Resource.from_json(
       ...>   %{

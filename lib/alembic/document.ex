@@ -1462,7 +1462,6 @@ defmodule Alembic.Document do
       iex> Alembic.Document.to_pagination(%Alembic.Document{})
       nil
 
-
   ## Single Page
 
   When there is only one page, there will be a `"first"` and `"last"` link pointing to the same page, but no

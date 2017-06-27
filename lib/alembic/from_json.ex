@@ -341,6 +341,135 @@ defmodule Alembic.FromJson do
   end
 
   @doc """
+  Ensurs that `json` is an `integer`.
+
+  An integer will be returned with an `ok` tuple
+
+      iex> Alembic.FromJson.integer_from_json(
+      ...>   1,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {:ok, 1}
+
+  A non-integer will be returned in an `error` tuple where the errors `Alembic.Document.t` has a member type error.
+
+      iex> Alembic.FromJson.integer_from_json(
+      ...>   1.5,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/number` type is not integer",
+              meta: %{
+                "type" => "integer"
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  """
+
+  @spec integer_from_json(integer, Error.t) :: {:ok, integer}
+  def integer_from_json(integer, _) when is_integer(integer), do: {:ok, integer}
+
+  # Alembic.json - integer
+  @spec integer_from_json(nil | true | false | list | float | String.t | Alembic.json_object, Error.t) ::
+          {:error, Document.t}
+  def integer_from_json(_, error_template) do
+    {
+      :error,
+      # Can't use %Document{} or it leads to compilation deadlock
+      struct!(
+        Document,
+        errors: [
+          Error.type(error_template, "integer")
+        ]
+      )
+    }
+  end
+
+  @doc """
+  Ensures `integer` is positive.
+
+  If greater than 0, then it's ok
+
+      iex> Alembic.FromJson.integer_to_positive_integer(
+      ...>   1,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {:ok, 1}
+
+  If it's 0, then it's a type error
+
+      iex> Alembic.FromJson.integer_to_positive_integer(
+      ...>   0,
+      ...>   %Alembic.Error{
+      ...>     source: %Alembic.Source{
+      ...>       pointer: "/page/number"
+      ...>     }
+      ...>   }
+      ...> )
+      {
+        :error,
+        %Alembic.Document{
+          errors: [
+            %Alembic.Error{
+              detail: "`/page/number` type is not positive integer",
+              meta: %{
+                "type" => "positive integer"
+              },
+              source: %Alembic.Source{
+                pointer: "/page/number"
+              },
+              status: "422",
+              title: "Type is wrong"
+            }
+          ]
+        }
+      }
+
+  """
+  @spec integer_to_positive_integer(0, Error.t) :: error
+  @spec integer_to_positive_integer(neg_integer, Error.t) :: error
+  @spec integer_to_positive_integer(pos_integer, Error.t) :: {:ok, pos_integer}
+  def integer_to_positive_integer(integer, error_template) when is_integer(integer) do
+    if integer > 0 do
+      {:ok, integer}
+    else
+      {
+        :error,
+        struct!(
+          Document,
+          errors: [
+            Error.type(error_template, "positive integer")
+          ]
+        )
+      }
+    end
+  end
+
+  @doc """
   Merges the `singleton_result` into the `collectable_result`.
 
   ## `collectable_ok`

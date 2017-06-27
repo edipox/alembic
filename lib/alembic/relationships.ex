@@ -214,7 +214,6 @@ defmodule Alembic.Relationships do
         }
       }
 
-
   """
   def from_json(json, error_template)
 

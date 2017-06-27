@@ -49,17 +49,25 @@ defmodule Alembic.Mixfile do
   defp deps do
     [
       # static code analysis for style and consistency
-      {:credo, "~> 0.7.3", only: [:dev, :test]},
+      {:credo, "~> 0.8.1", only: [:dev, :test]},
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
-      {:earmark, "~> 1.0", only: [:dev, :test]},
+      {
+        :earmark,
+        "~> 1.0",
+        # Commit with @KronicDeth's pragdave/earmark#144 PR that fixes unclosed backquote stickiness
+        commit: "103af39dd22d4199100f5d5dce6b3afd5959e03e",
+        github: "pragdave/earmark",
+        only: [:dev, :test],
+        override: true
+      },
       # conversion to Ecto.Schema struct
       {:ecto, "~> 2.0"},
       # test coverge tool.  Allow `--cover` option for `mix test`
-      {:excoveralls, "~> 0.6.3", only: :test},
+      {:excoveralls, "~> 0.7.0", only: :test},
       # documentation generation
-      {:ex_doc, "~> 0.15.1", only: [:dev, :test]},
+      {:ex_doc, "~> 0.16.1", only: [:dev, :test]},
       # documentation coverage
       {:inch_ex, "~> 0.5.1", only: [:dev, :test]},
       # formats test output for CircleCI

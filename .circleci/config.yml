@@ -24,10 +24,10 @@ jobs:
           name: mix-coveralls-circle
           command: mix coveralls.circle
       - store_test_results:
-          path: _build/test/lib/alembic/test-junit-report.xml
+          path: _build/test/lib/alembic
       # so test results show up as downloadable artifacts
       - store_artifacts:
-          path: _build/test/lib/alembic/test-junit-report.xml
+          path: _build/test/lib/alembic
           destination: Elixir
       - run:
           name: mix-dialyze-no-analyze

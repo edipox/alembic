@@ -15,10 +15,25 @@ jobs:
           name: mix-local-rebar
           command: mix local.rebar --force
       - restore_cache:
-          key: deps-{{ checksum "mix.lock" }}
+          keys:
+            - deps-{{ checksum "mix.lock" }}
+            # if `mix deps.get` changes `mix.lock`, then this one should still apply
+            - deps-{{ checksum "mix.exs" }}
+            # any previous branches deps
+            - deps
       - run:
           name: mix-deps-get
           command: mix deps.get --only test
+      # in case `mix.exs` has changed because of a requirement change
+      - save_cache:
+          key: deps
+          paths:
+            - deps
+      # in case `mix.lock` is updated by `mix deps.get`
+      - save_cache:
+          key: deps-{{ checksum "mix.exs" }}
+          paths:
+            - deps
       - save_cache:
           key: deps-{{ checksum "mix.lock" }}
           paths:

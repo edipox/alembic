@@ -11,7 +11,11 @@ defmodule Alembic.ToParams do
   `Alembic.Resource.id` with the values not being present initially, but being updated to `true` once the
   `{type, id}` is converted once.
   """
-  @type converted_by_id_by_type :: %{Resource.type => %{Resource.id => boolean}}
+  @type converted_by_id_by_type :: %{
+                                     Resource.type => %{
+                                       Resource.id => boolean
+                                     }
+                                   }
 
   @typedoc """
   Params format used by [`Ecto.Changeset.cast/4`](http://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4).
@@ -22,7 +26,11 @@ defmodule Alembic.ToParams do
   A nest map with the outer layer keyed by the `Alembic.Resource.type`, then the next layer keyed by the
   `Alembic.Resource.id` with the values being the full `Alembic.Resource.t`
   """
-  @type resource_by_id_by_type :: %{Resource.type => %{Resource.id => Resource.t}}
+  @type resource_by_id_by_type :: %{
+                                    Resource.type => %{
+                                      Resource.id => Resource.t
+                                    }
+                                  }
 
   # Callbacks
 
@@ -77,9 +85,11 @@ defmodule Alembic.ToParams do
   * `{:error, :already_converted}` - if the `type` and `id` of `convertable` already exists in `converted_by_id_by_type`
   * `{:error, :unset}` - if the `convertable` data is not set
   """
-  @callback to_params(convertable :: any,
-                      resource_by_id_by_type,
-                      converted_by_id_by_type) :: params | {:error, :already_converted | :unset}
+  @callback to_params(
+              convertable :: any,
+              resource_by_id_by_type,
+              converted_by_id_by_type
+            ) :: params | {:error, :already_converted | :unset}
 
   # Functions
 
@@ -192,10 +202,12 @@ defmodule Alembic.ToParams do
     replace_nested_with_owner(params, association_param_name, owner_key, nil)
   end
 
-  defp replace_nested(params,
-                      association_param_name,
-                      association_params,
-                      %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}) do
+  defp replace_nested(
+         params,
+         association_param_name,
+         association_params,
+         %Ecto.Association.BelongsTo{owner_key: owner_key, related_key: related_key}
+       ) do
     case Map.fetch(association_params, to_string(related_key)) do
       {:ok, foreign_key_value} ->
         replace_nested_with_owner(params, association_param_name, owner_key, foreign_key_value)
@@ -205,14 +217,14 @@ defmodule Alembic.ToParams do
   end
 
   defp replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, foreign_key_value)
-        when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
+       when is_binary(nested_param_name) and is_binary(foreign_key_param_name) do
     params
     |> Map.delete(nested_param_name)
     |> Map.put(foreign_key_param_name, foreign_key_value)
   end
 
   defp replace_nested_with_owner(params, nested_param_name, owner_key, owner_key_value)
-        when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
+       when is_map(params) and is_binary(nested_param_name) and is_atom(owner_key) do
     foreign_key_param_name = to_string(owner_key)
 
     replace_nested_with_foreign(params, nested_param_name, foreign_key_param_name, owner_key_value)

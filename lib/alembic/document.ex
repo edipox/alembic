@@ -15,46 +15,46 @@ defmodule Alembic.Document do
   # Constants
 
   @data_options %{
-                  field: :data,
-                  member: %{
-                    module: ResourceLinkage,
-                    name: "data"
-                  }
-                }
+    field: :data,
+    member: %{
+      module: ResourceLinkage,
+      name: "data"
+    }
+  }
 
   @errors_options %{
-                    field: :errors,
-                    member: %{
-                      name: "errors"
-                    }
-                  }
+    field: :errors,
+    member: %{
+      name: "errors"
+    }
+  }
 
   @included_options %{
-                      field: :included,
-                      member: %{
-                        name: "included"
-                      }
-                    }
+    field: :included,
+    member: %{
+      name: "included"
+    }
+  }
 
   @human_type "document"
 
   @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
+    field: :links,
+    member: %{
+      module: Links,
+      name: "links"
+    }
+  }
 
   @minimum_children ~w{data errors meta}
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    }
+  }
 
   # DOES NOT include `@errors_options` because `&FromJson.from_json_array(&1, &2, Error)` cannot appear in a module
   #   attribute used in a function
@@ -1036,9 +1036,13 @@ defmodule Alembic.Document do
     %__MODULE__{
       # Don't use Enum.into as it will reverse the list immediately, which is more reversing that necessary since
       # merge is called a bunch of time in sequence.
-      errors: Enum.reduce(second_errors, first_errors, fn (second_error, acc_errors) ->
-        [second_error | acc_errors]
-      end)
+      errors: Enum.reduce(
+        second_errors,
+        first_errors,
+        fn (second_error, acc_errors) ->
+          [second_error | acc_errors]
+        end
+      )
     }
   end
 
@@ -1431,19 +1435,25 @@ defmodule Alembic.Document do
   @doc """
   Call `to_ecto_schema/2` instead to automatically generate `attributes_by_id_by_type`
   """
-  @spec to_ecto_schema(%__MODULE__{data: [Resource.t] | Resource.t},
-                       ToParams.resource_by_id_by_type,
-                       ToEctoSchema.ecto_schema_module_by_type) :: [struct] | struct
+  @spec to_ecto_schema(
+          %__MODULE__{data: [Resource.t] | Resource.t},
+          ToParams.resource_by_id_by_type,
+          ToEctoSchema.ecto_schema_module_by_type
+        ) :: [struct] | struct
 
-  def to_ecto_schema(%__MODULE__{data: resource = %Resource{}},
-                     resource_by_id_by_type,
-                     ecto_schema_module_by_type) do
+  def to_ecto_schema(
+        %__MODULE__{data: resource = %Resource{}},
+        resource_by_id_by_type,
+        ecto_schema_module_by_type
+      ) do
     Resource.to_ecto_schema(resource, resource_by_id_by_type, ecto_schema_module_by_type)
   end
 
-  def to_ecto_schema(%__MODULE__{data: resources},
-                     resource_by_id_by_type,
-                     ecto_schema_module_by_type) when is_list(resources) do
+  def to_ecto_schema(
+        %__MODULE__{data: resources},
+        resource_by_id_by_type,
+        ecto_schema_module_by_type
+      ) when is_list(resources) do
     Enum.map resources, &Resource.to_ecto_schema(&1, resource_by_id_by_type, ecto_schema_module_by_type)
   end
 
@@ -1587,7 +1597,14 @@ defmodule Alembic.Document do
   """
   @spec to_pagination(t) :: Pagination.t | nil
 
-  def to_pagination(%__MODULE__{links: links, meta: %{"record_count" => total_size}}) do
+  def to_pagination(
+        %__MODULE__{
+          links: links,
+          meta: %{
+            "record_count" => total_size
+          }
+        }
+      ) do
     document_pagination = %Pagination{total_size: total_size}
 
     case Links.to_pagination(links) do
@@ -1833,8 +1850,10 @@ defmodule Alembic.Document do
 
   See `Alembic.Document.to_params/1`
   """
-  @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
-                  ToParams.resource_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          %__MODULE__{data: [Resource.t] | Resource.t | nil},
+          ToParams.resource_by_id_by_type
+        ) :: ToParams.params
   def to_params(document, resource_by_id_by_type), do: to_params(document, resource_by_id_by_type, %{})
 
   @doc """
@@ -1844,9 +1863,11 @@ defmodule Alembic.Document do
 
   See `InterpreterServer.Api.Document.to_params/1`
   """
-  @spec to_params(%__MODULE__{data: [Resource.t] | Resource.t | nil},
-                  ToParams.resource_by_id_by_type,
-                  ToParams.converted_by_id_by_type) :: ToParams.params
+  @spec to_params(
+          %__MODULE__{data: [Resource.t] | Resource.t | nil},
+          ToParams.resource_by_id_by_type,
+          ToParams.converted_by_id_by_type
+        ) :: ToParams.params
   def to_params(%__MODULE__{data: data}, resource_by_id_by_type, converted_by_id_by_type) when is_list(data) do
     Enum.map(data, &Resource.to_params(&1, resource_by_id_by_type, converted_by_id_by_type))
   end

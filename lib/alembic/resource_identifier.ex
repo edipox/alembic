@@ -13,13 +13,13 @@ defmodule Alembic.ResourceIdentifier do
   @human_type "resource identifier"
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    },
+    parent: nil
+  }
 
   # Struct
 

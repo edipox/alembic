@@ -128,14 +128,16 @@ defmodule Alembic.FromJson do
   end
 
   @spec from_json_array(Alembic.json, Error.t, (Alembic.json, Error.t -> singleton_result)) ::
-        {:ok, [singleton_value]} | error
+          {:ok, [singleton_value]} | error
   def from_json_array(json_array, error_template, element_from_json) when is_list(json_array) and
                                                                           is_function(element_from_json, 2) do
     json_array
     |> Stream.with_index
-    |> Stream.map(fn {element_json, index} ->
-         element_from_json.(element_json, Error.descend(error_template, index))
-       end)
+    |> Stream.map(
+         fn {element_json, index} ->
+           element_from_json.(element_json, Error.descend(error_template, index))
+         end
+       )
     |> reduce({:ok, []})
   end
 
@@ -294,26 +296,50 @@ defmodule Alembic.FromJson do
 
   """
   @spec from_parent_json_to_field_result(
-    %{parent: %{json: Alembic.json_object, error_template: Error.t},
-      member: %{
-                required(:from_json) => (Alembic.json, Origin.t -> singleton_result),
-                required(:name) => String.t,
-                optional(:required) => boolean
-              } |
-              %{name: String.t, module: module},
-      field: atom}) :: field_result | error | :error
+          %{
+            parent: %{
+              json: Alembic.json_object,
+              error_template: Error.t
+            },
+            member: %{
+                      required(:from_json) => (Alembic.json, Origin.t -> singleton_result),
+                      required(:name) => String.t,
+                      optional(:required) => boolean
+                    } |
+                    %{name: String.t, module: module},
+            field: atom
+          }
+        ) :: field_result | error | :error
 
-  def from_parent_json_to_field_result(options = %{member: %{name: member_name, module: member_module}}) do
+  def from_parent_json_to_field_result(
+        options = %{
+          member: %{
+            name: member_name,
+            module: member_module
+          }
+        }
+      ) do
     from_parent_json_to_field_result(
-      %{options | member: %{name: member_name, from_json: &member_module.from_json/2}}
+      %{
+        options |
+        member: %{
+          name: member_name,
+          from_json: &member_module.from_json/2
+        }
+      }
     )
   end
 
-  def from_parent_json_to_field_result(%{
-                                         field: field_name,
-                                         member: member = %{name: member_name, from_json: from_json},
-                                         parent: %{json: parent_json, error_template: parent_error_template}
-                                       }) do
+  def from_parent_json_to_field_result(
+        %{
+          field: field_name,
+          member: member = %{name: member_name, from_json: from_json},
+          parent: %{
+            json: parent_json,
+            error_template: parent_error_template
+          }
+        }
+      ) do
     case Map.fetch(parent_json, member_name) do
       {:ok, value_json} ->
         member_error_template = Error.descend(parent_error_template, member_name)

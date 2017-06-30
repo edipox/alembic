@@ -14,68 +14,68 @@ defmodule Alembic.Error do
   # Constants
 
   @code_options %{
-                  field: :code,
-                  member: %{
-                    from_json: &FromJson.string_from_json/2,
-                    name: "code"
-                  },
-                }
+    field: :code,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "code"
+    },
+  }
 
   @detail_options %{
-                    field: :detail,
-                    member: %{
-                      from_json: &FromJson.string_from_json/2,
-                      name: "detail"
-                    },
-                  }
+    field: :detail,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "detail"
+    },
+  }
 
   @id_options %{
-                field: :id,
-                member: %{
-                  from_json: &FromJson.string_from_json/2,
-                  name: "id"
-                }
-              }
+    field: :id,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "id"
+    }
+  }
 
   @links_options %{
-                   field: :links,
-                   member: %{
-                     module: Links,
-                     name: "links"
-                   }
-                 }
+    field: :links,
+    member: %{
+      module: Links,
+      name: "links"
+    }
+  }
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  }
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    }
+  }
 
   @source_options %{
-                    field: :source,
-                    member: %{
-                      module: Source,
-                      name: "source"
-                    }
-                  }
+    field: :source,
+    member: %{
+      module: Source,
+      name: "source"
+    }
+  }
 
   @status_options %{
-                    field: :status,
-                    member: %{
-                      from_json: &FromJson.string_from_json/2,
-                      name: "status"
-                    }
-                  }
+    field: :status,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "status"
+    }
+  }
 
   @title_options %{
-                   field: :title,
-                   member: %{
-                     from_json: &FromJson.string_from_json/2,
-                     name: "title"
-                   }
-                 }
+    field: :title,
+    member: %{
+      from_json: &FromJson.string_from_json/2,
+      name: "title"
+    }
+  }
 
   @child_options_list [
     @code_options,
@@ -269,7 +269,7 @@ defmodule Alembic.Error do
 
   """
   @spec from_ecto_changeset_error(ecto_changeset_error, Source.pointer_path_from_ecto_changeset_error_field_options) ::
-        Error.t
+          Error.t
   def from_ecto_changeset_error(
         {field, message},
         pointer_path_from_ecto_changeset_error_field_options = %{format_key: format_key}
@@ -438,8 +438,10 @@ defmodule Alembic.Error do
   @spec minimum_children(t, [String.t]) :: t
   def minimum_children(template, children)
 
-  def minimum_children(%__MODULE__{source: source = %Source{pointer: parent_pointer}},
-                       children) when is_list(children) do
+  def minimum_children(
+        %__MODULE__{source: source = %Source{pointer: parent_pointer}},
+        children
+      ) when is_list(children) do
     %__MODULE__{
       detail: "At least one of the following children of `#{parent_pointer}` must be present:\n" <>
               Enum.join(children, "\n"),
@@ -556,7 +558,14 @@ defmodule Alembic.Error do
   """
   @spec relationship_path(String.t) :: t
   @spec relationship_path(t, String.t) :: t
-  def relationship_path(template \\ %__MODULE__{source: %Source{parameter: "include"}}, unknown_relationship_path)
+  def relationship_path(
+        template \\ %__MODULE__{
+          source: %Source{
+            parameter: "include"
+          }
+        },
+        unknown_relationship_path
+      )
   def relationship_path(%__MODULE__{source: source}, unknown_relationship_path) do
     %__MODULE__{
       detail: "`#{unknown_relationship_path}` is an unknown relationship path",
@@ -768,9 +777,9 @@ defmodule Alembic.Error do
 
     """
     def encode(error = %@for{}, options) do
-       map = for {field, value} <- Map.from_struct(error), value != nil, into: %{}, do: {field, value}
+      map = for {field, value} <- Map.from_struct(error), value != nil, into: %{}, do: {field, value}
 
-       Poison.Encoder.Map.encode(map, options)
+      Poison.Encoder.Map.encode(map, options)
     end
   end
 end

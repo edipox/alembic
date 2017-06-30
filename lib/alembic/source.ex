@@ -26,7 +26,9 @@ defmodule Alembic.Source do
   @type pointer_path_from_ecto_changeset_error_field_options ::
           %{
             required(:association_set) => MapSet.t(atom),
-            required(:association_by_foreign_key) => %{atom => atom},
+            required(:association_by_foreign_key) => %{
+              atom => atom
+            },
             required(:attribute_set) => MapSet.t(atom),
             required(:format_key) => (atom -> String.t)
           }
@@ -357,7 +359,9 @@ defmodule Alembic.Source do
   @spec pointer_path_from_ecto_changeset_error_field_options_from_ecto_schema_module(Ecto.Schema.t) ::
           %{
             required(:association_set) => MapSet.t(atom),
-            required(:association_by_foreign_key) => %{atom => atom},
+            required(:association_by_foreign_key) => %{
+              atom => atom
+            },
             required(:attribute_set) => MapSet.t(atom)
           }
   def pointer_path_from_ecto_changeset_error_field_options_from_ecto_schema_module(ecto_schema_module) do
@@ -391,7 +395,8 @@ defmodule Alembic.Source do
   defp ecto_schema_module_to_attributes(ecto_schema_module, exclusions) do
     # ecto_schema_module.__schema__(:fields) does not include virtual fields, so
     # deduce real and virtual fields from struct keys
-    keys = ecto_schema_module.__struct__() |> Map.keys()
+    keys = ecto_schema_module.__struct__()
+           |> Map.keys()
     keys -- [:__meta__, :__struct__ | exclusions]
   end
 

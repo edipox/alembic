@@ -58,9 +58,12 @@ defmodule Alembic.ToEctoSchema do
 
     :associations
     |> ecto_schema_module.__schema__
-    |> Enum.reduce(field_struct, fn (association_name, acc) ->
-         put_named_association(acc, params, ecto_schema_module, association_name)
-       end)
+    |> Enum.reduce(
+         field_struct,
+         fn (association_name, acc) ->
+           put_named_association(acc, params, ecto_schema_module, association_name)
+         end
+       )
   end
 
   @spec to_ecto_schema(%{type: Resource.type}, ToParams.params, ecto_schema_module_by_type) :: struct
@@ -71,7 +74,11 @@ defmodule Alembic.ToEctoSchema do
 
   ## Private Functions
 
-  defp put_association(acc, relationship_params, %Ecto.Association.BelongsTo{field: field, owner_key: owner_key, related: related}) do
+  defp put_association(
+         acc,
+         relationship_params,
+         %Ecto.Association.BelongsTo{field: field, owner_key: owner_key, related: related}
+       ) do
     associated = case relationship_params do
       map when is_map(map) -> to_ecto_schema(map, related)
       nil -> nil
@@ -87,7 +94,11 @@ defmodule Alembic.ToEctoSchema do
     end
   end
 
-  defp put_association(acc, relationship_params, %Ecto.Association.Has{cardinality: :many, field: field, related: related}) do
+  defp put_association(
+         acc,
+         relationship_params,
+         %Ecto.Association.Has{cardinality: :many, field: field, related: related}
+       ) do
     associated = case relationship_params do
       list when is_list(list) ->
         Enum.map(list, &to_ecto_schema(&1, related))
@@ -98,7 +109,11 @@ defmodule Alembic.ToEctoSchema do
     %{acc | field => associated}
   end
 
-  defp put_association(acc, relationship_params, %Ecto.Association.Has{cardinality: :one, field: field, related: related}) do
+  defp put_association(
+         acc,
+         relationship_params,
+         %Ecto.Association.Has{cardinality: :one, field: field, related: related}
+       ) do
     associated = case relationship_params do
       map when is_map(map) -> to_ecto_schema(map, related)
       nil -> nil

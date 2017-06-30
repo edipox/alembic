@@ -95,101 +95,107 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "title" => "JSON API paints my bikeshed!"
-          },
-          id: "1",
-          links: %{
-            "self" => "http://example.com/articles/1"
-          },
-          relationships: %{
-            "author" => %Relationship{
-              data: %ResourceIdentifier{
-                id: "9",
-                type: "people"
-              },
-              links: %{
-                "related" => "http://example.com/articles/1/author",
-                "self" => "http://example.com/articles/1/relationships/author"
-              }
-            },
-            "comments" => %Relationship{
-              data: [
-                %ResourceIdentifier{
-                  id: "5",
-                  type: "comments"
-                },
-                %ResourceIdentifier{
-                  id: "12",
-                  type: "comments"
-                }
-              ],
-              links: %{
-                "related" => "http://example.com/articles/1/comments",
-                "self" => "http://example.com/articles/1/relationships/comments"
-              }
-            }
-          },
-          type: "articles"
-        }
-      ],
-      included: [
-        %Resource{
-          attributes: %{
-            "first-name" => "Dan",
-            "last-name" => "Gebhardt",
-            "twitter" => "dgeb"
-          },
-          id: "9",
-          links: %{
-            "self" => "http://example.com/people/9"
-          },
-          type: "people"
-        },
-        %Resource{
-          attributes: %{
-            "body" => "First!"
-          },
-          id: "5",
-          links: %{
-            "self" => "http://example.com/comments/5"
-          },
-          relationships: %{
-            "author" => %Relationship{
-              data: %ResourceIdentifier{
-                id: "2",
-                type: "people"
-              }
-            }
-          },
-          type: "comments"
-        },
-        %Resource{
-          attributes: %{
-            "body" => "I like XML better"
-          },
-          id: "12",
-          links: %{
-            "self" => "http://example.com/comments/12"
-          },
-          relationships: %{
-            "author" => %Relationship{
-              data: %ResourceIdentifier{
-                id: "9",
-                type: "people"
-              }
-            }
-          },
-          type: "comments"
-        }
-      ]
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "title" => "JSON API paints my bikeshed!"
+                 },
+                 id: "1",
+                 links: %{
+                   "self" => "http://example.com/articles/1"
+                 },
+                 relationships: %{
+                   "author" => %Relationship{
+                     data: %ResourceIdentifier{
+                       id: "9",
+                       type: "people"
+                     },
+                     links: %{
+                       "related" => "http://example.com/articles/1/author",
+                       "self" => "http://example.com/articles/1/relationships/author"
+                     }
+                   },
+                   "comments" => %Relationship{
+                     data: [
+                       %ResourceIdentifier{
+                         id: "5",
+                         type: "comments"
+                       },
+                       %ResourceIdentifier{
+                         id: "12",
+                         type: "comments"
+                       }
+                     ],
+                     links: %{
+                       "related" => "http://example.com/articles/1/comments",
+                       "self" => "http://example.com/articles/1/relationships/comments"
+                     }
+                   }
+                 },
+                 type: "articles"
+               }
+             ],
+             included: [
+               %Resource{
+                 attributes: %{
+                   "first-name" => "Dan",
+                   "last-name" => "Gebhardt",
+                   "twitter" => "dgeb"
+                 },
+                 id: "9",
+                 links: %{
+                   "self" => "http://example.com/people/9"
+                 },
+                 type: "people"
+               },
+               %Resource{
+                 attributes: %{
+                   "body" => "First!"
+                 },
+                 id: "5",
+                 links: %{
+                   "self" => "http://example.com/comments/5"
+                 },
+                 relationships: %{
+                   "author" => %Relationship{
+                     data: %ResourceIdentifier{
+                       id: "2",
+                       type: "people"
+                     }
+                   }
+                 },
+                 type: "comments"
+               },
+               %Resource{
+                 attributes: %{
+                   "body" => "I like XML better"
+                 },
+                 id: "12",
+                 links: %{
+                   "self" => "http://example.com/comments/12"
+                 },
+                 relationships: %{
+                   "author" => %Relationship{
+                     data: %ResourceIdentifier{
+                       id: "9",
+                       type: "people"
+                     }
+                   }
+                 },
+                 type: "comments"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -216,30 +222,35 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server}
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "title" => "JSON API paints my bikeshed!"
-          },
-          id: "1",
-          type: "articles"
-        },
-        %Resource{
-          attributes: %{
-            "title" => "Rails is Omakase"
-          },
-          id: "2",
-          type: "articles"
-        }
-      ],
-      links: %{
-        "self" => "http://example.com/articles"
-      }
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "title" => "JSON API paints my bikeshed!"
+                 },
+                 id: "1",
+                 type: "articles"
+               },
+               %Resource{
+                 attributes: %{
+                   "title" => "Rails is Omakase"
+                 },
+                 id: "2",
+                 type: "articles"
+               }
+             ],
+             links: %{
+               "self" => "http://example.com/articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -252,15 +263,21 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [],
-      links: %{
-        "self" => "http://example.com/articles"
-      }
-    }
+             data: [],
+             links: %{
+               "self" => "http://example.com/articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -286,28 +303,34 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "title" => "JSON API paints my bikeshed!"
-        },
-        id: "1",
-        relationships: %{
-          "author" => %Relationship{
-            links: %{
-              "related" => "http://example.com/articles/1/author"
-            }
-          }
-        },
-        type: "articles"
-      },
-      links: %{
-        "self" => "http://example.com/articles/1"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "title" => "JSON API paints my bikeshed!"
+               },
+               id: "1",
+               relationships: %{
+                 "author" => %Relationship{
+                   links: %{
+                     "related" => "http://example.com/articles/1/author"
+                   }
+                 }
+               },
+               type: "articles"
+             },
+             links: %{
+               "self" => "http://example.com/articles/1"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -320,15 +343,21 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: nil,
-      links: %{
-        "self" => "http://example.com/articles/1/author"
-      }
-    }
+             data: nil,
+             links: %{
+               "self" => "http://example.com/articles/1/author"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -347,19 +376,25 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %ResourceIdentifier{
-        id: "12",
-        type: "people"
-      },
-      links: %{
-        "related" => "/articles/1/author",
-        "self" => "/articles/1/relationships/author"
-      }
-    }
+             data: %ResourceIdentifier{
+               id: "12",
+               type: "people"
+             },
+             links: %{
+               "related" => "/articles/1/author",
+               "self" => "/articles/1/relationships/author"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -373,16 +408,22 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: nil,
-      links: %{
-        "related" => "/articles/1/author",
-        "self" => "/articles/1/relationships/author"
-      }
-    }
+             data: nil,
+             links: %{
+               "related" => "/articles/1/author",
+               "self" => "/articles/1/relationships/author"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -399,25 +440,31 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
-    {:ok, document} = Document.from_json(decoded, error_template)
-
-    assert document ==  %Document{
-      data: [
-        %ResourceIdentifier{
-          id: "2",
-          type: "tags"
-        },
-        %ResourceIdentifier{
-          id: "3",
-          type: "tags"
-        }
-      ],
-      links: %{
-        "related" => "/articles/1/tags",
-        "self" => "/articles/1/relationships/tags"
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
       }
     }
+    {:ok, document} = Document.from_json(decoded, error_template)
+
+    assert document == %Document{
+             data: [
+               %ResourceIdentifier{
+                 id: "2",
+                 type: "tags"
+               },
+               %ResourceIdentifier{
+                 id: "3",
+                 type: "tags"
+               }
+             ],
+             links: %{
+               "related" => "/articles/1/tags",
+               "self" => "/articles/1/relationships/tags"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -431,16 +478,22 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :fetch,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [],
-      links: %{
-        "related" => "/articles/1/tags",
-        "self" => "/articles/1/relationships/tags"
-      }
-    }
+             data: [],
+             links: %{
+               "related" => "/articles/1/tags",
+               "self" => "/articles/1/relationships/tags"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -463,26 +516,32 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "src" => "http://example.com/images/productivity.png",
-          "title" => "Ember Hamster"
-        },
-        relationships: %{
-          "photographer" => %Relationship{
-            data: %ResourceIdentifier{
-              id: "9",
-              type: "people"
-            }
-          }
-        },
-        type: "photos"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "src" => "http://example.com/images/productivity.png",
+                 "title" => "Ember Hamster"
+               },
+               relationships: %{
+                 "photographer" => %Relationship{
+                   data: %ResourceIdentifier{
+                     id: "9",
+                     type: "people"
+                   }
+                 }
+               },
+               type: "photos"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -501,18 +560,25 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "src" => "http://example.com/images/productivity.png",
-          "title" => "Ember Hamster"},
-        id: "550e8400-e29b-41d4-a716-446655440000",
-        type: "photos"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "src" => "http://example.com/images/productivity.png",
+                 "title" => "Ember Hamster"
+               },
+               id: "550e8400-e29b-41d4-a716-446655440000",
+               type: "photos"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -534,22 +600,28 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "src" => "http://example.com/images/productivity.png",
-          "title" => "Ember Hamster"
-        },
-        id: "550e8400-e29b-41d4-a716-446655440000",
-        links: %{
-          "self" => "http://example.com/photos/550e8400-e29b-41d4-a716-446655440000"
-        },
-        type: "photos"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "src" => "http://example.com/images/productivity.png",
+                 "title" => "Ember Hamster"
+               },
+               id: "550e8400-e29b-41d4-a716-446655440000",
+               links: %{
+                 "self" => "http://example.com/photos/550e8400-e29b-41d4-a716-446655440000"
+               },
+               type: "photos"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -567,18 +639,24 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "title" => "To TDD or Not"
-        },
-        id: "1",
-        type: "articles"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "title" => "To TDD or Not"
+               },
+               id: "1",
+               type: "articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -597,19 +675,25 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "text" => "TLDR; It's complicated... but check your test coverage regardless.",
-          "title" => "To TDD or Not"
-        },
-        id: "1",
-        type: "articles"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "text" => "TLDR; It's complicated... but check your test coverage regardless.",
+                 "title" => "To TDD or Not"
+               },
+               id: "1",
+               type: "articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -629,23 +713,29 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        id: "1",
-        relationships: %{
-          "author" => %Relationship{
-            data: %ResourceIdentifier{
-              id: "1",
-              type: "people"
-            }
-          }
-        },
-        type: "articles"
-      }
-    }
+             data: %Resource{
+               id: "1",
+               relationships: %{
+                 "author" => %Relationship{
+                   data: %ResourceIdentifier{
+                     id: "1",
+                     type: "people"
+                   }
+                 }
+               },
+               type: "articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -666,29 +756,35 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        id: "1",
-        relationships: %{
-          "tags" => %Relationship{
-            data: [
-              %ResourceIdentifier{
-                id: "2",
-                type: "tags"
-              },
-              %ResourceIdentifier{
-                id: "3",
-                type: "tags"
-              }
-            ]
-          }
-        },
-        type: "articles"
-      }
-    }
+             data: %Resource{
+               id: "1",
+               relationships: %{
+                 "tags" => %Relationship{
+                   data: [
+                     %ResourceIdentifier{
+                       id: "2",
+                       type: "tags"
+                     },
+                     %ResourceIdentifier{
+                       id: "3",
+                       type: "tags"
+                     }
+                   ]
+                 }
+               },
+               type: "articles"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -700,15 +796,21 @@ defmodule Alembic.DocumentTest do
       "data": {"type": "people", "id": "12"}
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %ResourceIdentifier{
-        id: "12",
-        type: "people"
-      }
-    }
+             data: %ResourceIdentifier{
+               id: "12",
+               type: "people"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -718,12 +820,18 @@ defmodule Alembic.DocumentTest do
       "data": null
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: nil
-    }
+             data: nil
+           }
     assert_idempotent document, error_template
   end
 
@@ -738,21 +846,27 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %ResourceIdentifier{
-          id: "2",
-          type: "tags"
-        },
-        %ResourceIdentifier{
-          id: "3",
-          type: "tags"
-        }
-      ]
-    }
+             data: [
+               %ResourceIdentifier{
+                 id: "2",
+                 type: "tags"
+               },
+               %ResourceIdentifier{
+                 id: "3",
+                 type: "tags"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -762,12 +876,18 @@ defmodule Alembic.DocumentTest do
       "data": []
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: []
-    }
+             data: []
+           }
     assert_idempotent document, error_template
   end
 
@@ -779,17 +899,23 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %ResourceIdentifier{
-          id: "123",
-          type: "comments"
-        }
-      ]
-    }
+             data: [
+               %ResourceIdentifier{
+                 id: "123",
+                 type: "comments"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -802,21 +928,27 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :delete, "sender" => :client}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :delete,
+        "sender" => :client
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %ResourceIdentifier{
-          id: "12",
-          type: "comments"
-        },
-        %ResourceIdentifier{
-          id: "13",
-          type: "comments"
-        }
-      ]
-    }
+             data: [
+               %ResourceIdentifier{
+                 id: "12",
+                 type: "comments"
+               },
+               %ResourceIdentifier{
+                 id: "13",
+                 type: "comments"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -837,21 +969,27 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: %Resource{
-        attributes: %{
-          "status" => "Pending request, waiting other process"
-        },
-        id: "5234",
-        links: %{
-          "self" => "/photos/queue-jobs/5234"
-        },
-        type: "queue-jobs"
-      }
-    }
+             data: %Resource{
+               attributes: %{
+                 "status" => "Pending request, waiting other process"
+               },
+               id: "5234",
+               links: %{
+                 "self" => "/photos/queue-jobs/5234"
+               },
+               type: "queue-jobs"
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -888,42 +1026,48 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "body" => "The shortest article. Ever.",
-            "created" => "2015-05-22T14:56:29.000Z",
-            "title" => "JSON API paints my bikeshed!",
-            "updated" => "2015-05-22T14:56:28.000Z"
-          },
-          id: "1",
-          relationships: %{
-            "author" => %Relationship{
-              data: %ResourceIdentifier{
-                id: "42",
-                type: "people"
-              }
-            }
-          },
-          type: "articles"
-        }
-      ],
-      included: [
-        %Resource{
-          attributes: %{
-            "age" => 80,
-            "gender" => "male",
-            "name" => "John"
-          },
-          id: "42",
-          type: "people"
-        }
-      ]
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "body" => "The shortest article. Ever.",
+                   "created" => "2015-05-22T14:56:29.000Z",
+                   "title" => "JSON API paints my bikeshed!",
+                   "updated" => "2015-05-22T14:56:28.000Z"
+                 },
+                 id: "1",
+                 relationships: %{
+                   "author" => %Relationship{
+                     data: %ResourceIdentifier{
+                       id: "42",
+                       type: "people"
+                     }
+                   }
+                 },
+                 type: "articles"
+               }
+             ],
+             included: [
+               %Resource{
+                 attributes: %{
+                   "age" => 80,
+                   "gender" => "male",
+                   "name" => "John"
+                 },
+                 id: "42",
+                 type: "people"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -954,38 +1098,44 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "body" => "The shortest article. Ever.",
-            "title" => "JSON API paints my bikeshed!"
-          },
-          id: "1",
-          relationships: %{
-            "author" => %Relationship{
-              data: %ResourceIdentifier{
-                id: "42",
-                type: "people"
-              }
-            }
-          },
-          type: "articles"
-        }
-      ],
-      included: [
-        %Resource{
-          attributes: %{
-            "name" => "John"
-          },
-          id: "42",
-          type: "people"
-        }
-      ]
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "body" => "The shortest article. Ever.",
+                   "title" => "JSON API paints my bikeshed!"
+                 },
+                 id: "1",
+                 relationships: %{
+                   "author" => %Relationship{
+                     data: %ResourceIdentifier{
+                       id: "42",
+                       type: "people"
+                     }
+                   }
+                 },
+                 type: "articles"
+               }
+             ],
+             included: [
+               %Resource{
+                 attributes: %{
+                   "name" => "John"
+                 },
+                 id: "42",
+                 type: "people"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1011,30 +1161,36 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "body" => "The shortest article. Ever.",
-            "title" => "JSON API paints my bikeshed!"
-          },
-          id: "1",
-          type: "articles"
-        }
-      ],
-      included: [
-        %Resource{
-          attributes: %{
-            "name" => "John"
-          },
-          id: "42",
-          type: "people"
-        }
-      ]
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "body" => "The shortest article. Ever.",
+                   "title" => "JSON API paints my bikeshed!"
+                 },
+                 id: "1",
+                 type: "articles"
+               }
+             ],
+             included: [
+               %Resource{
+                 attributes: %{
+                   "name" => "John"
+                 },
+                 id: "42",
+                 type: "people"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1067,33 +1223,39 @@ defmodule Alembic.DocumentTest do
       }
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :fetch, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      data: [
-        %Resource{
-          attributes: %{
-            "body" => "The shortest article. Ever.",
-            "created" => "2015-05-22T14:56:29.000Z",
-            "title" => "JSON API paints my bikeshed!",
-            "updated" => "2015-05-22T14:56:28.000Z"
-          },
-          id: "3",
-          type: "articles"
-        }
-      ],
-      links: %{
-        "first" => "http://example.com/articles?page[number]=1&page[size]=1",
-        "last" => "http://example.com/articles?page[number]=13&page[size]=1",
-        "next" => "http://example.com/articles?page[number]=4&page[size]=1",
-        "prev" => "http://example.com/articles?page[number]=2&page[size]=1",
-        "self" => "http://example.com/articles?page[number]=3&page[size]=1"
-      },
-      meta: %{
-        "total-pages" => 13
-      }
-    }
+             data: [
+               %Resource{
+                 attributes: %{
+                   "body" => "The shortest article. Ever.",
+                   "created" => "2015-05-22T14:56:29.000Z",
+                   "title" => "JSON API paints my bikeshed!",
+                   "updated" => "2015-05-22T14:56:28.000Z"
+                 },
+                 id: "3",
+                 type: "articles"
+               }
+             ],
+             links: %{
+               "first" => "http://example.com/articles?page[number]=1&page[size]=1",
+               "last" => "http://example.com/articles?page[number]=13&page[size]=1",
+               "next" => "http://example.com/articles?page[number]=4&page[size]=1",
+               "prev" => "http://example.com/articles?page[number]=2&page[size]=1",
+               "self" => "http://example.com/articles?page[number]=3&page[size]=1"
+             },
+             meta: %{
+               "total-pages" => 13
+             }
+           }
     assert_idempotent document, error_template
   end
 
@@ -1112,21 +1274,27 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "First name must contain at least three characters.",
-          source: %Source{
-            pointer: "/data/attributes/first-name"
-          },
-          status: "422",
-          title: "Invalid Attribute"
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "First name must contain at least three characters.",
+                 source: %Source{
+                   pointer: "/data/attributes/first-name"
+                 },
+                 status: "422",
+                 title: "Invalid Attribute"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1155,35 +1323,41 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :update, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :update,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "Editing secret powers is not authorized on Sundays.",
-          source: %Source{
-            pointer: "/data/attributes/secret-powers"
-          },
-          status: "403"
-        },
-        %Error{
-          detail: "Volume does not, in fact, go to 11.",
-          source: %Source{
-            pointer: "/data/attributes/volume"
-          },
-          status: "422"
-        },
-        %Error{
-          detail: "Reputation service not responding after three requests.",
-          source: %Source{
-            pointer: "/data/attributes/reputation"
-          },
-          status: "500",
-          title: "The backend responded with an error"
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "Editing secret powers is not authorized on Sundays.",
+                 source: %Source{
+                   pointer: "/data/attributes/secret-powers"
+                 },
+                 status: "403"
+               },
+               %Error{
+                 detail: "Volume does not, in fact, go to 11.",
+                 source: %Source{
+                   pointer: "/data/attributes/volume"
+                 },
+                 status: "422"
+               },
+               %Error{
+                 detail: "Reputation service not responding after three requests.",
+                 source: %Source{
+                   pointer: "/data/attributes/reputation"
+                 },
+                 status: "500",
+                 title: "The backend responded with an error"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1204,27 +1378,33 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "First name must contain at least three characters.",
-          source: %Source{
-            pointer: "/data/attributes/first-name"
-          },
-          title: "Invalid Attribute"
-        },
-        %Error{
-          detail: "First name must contain an emoji.",
-          source: %Source{
-            pointer: "/data/attributes/first-name"
-          },
-          title: "Invalid Attribute"
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "First name must contain at least three characters.",
+                 source: %Source{
+                   pointer: "/data/attributes/first-name"
+                 },
+                 title: "Invalid Attribute"
+               },
+               %Error{
+                 detail: "First name must contain an emoji.",
+                 source: %Source{
+                   pointer: "/data/attributes/first-name"
+                 },
+                 title: "Invalid Attribute"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1255,36 +1435,42 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          code: "123",
-          detail: "First name must contain at least three characters.",
-          source: %Source{
-            pointer: "/data/attributes/first-name"
-          },
-          title: "Value is too short"
-        },
-        %Error{
-          code: "225",
-          detail: "The password provided is missing a punctuation character.",
-          source: %Source{
-            pointer: "/data/attributes/password"
-          },
-          title: "Passwords must contain a letter, number, and punctuation character."
-        },
-        %Error{
-          code: "226",
-          source: %Source{
-            pointer: "/data/attributes/password"
-          },
-          title: "Password and password confirmation do not match."
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 code: "123",
+                 detail: "First name must contain at least three characters.",
+                 source: %Source{
+                   pointer: "/data/attributes/first-name"
+                 },
+                 title: "Value is too short"
+               },
+               %Error{
+                 code: "225",
+                 detail: "The password provided is missing a punctuation character.",
+                 source: %Source{
+                   pointer: "/data/attributes/password"
+                 },
+                 title: "Passwords must contain a letter, number, and punctuation character."
+               },
+               %Error{
+                 code: "226",
+                 source: %Source{
+                   pointer: "/data/attributes/password"
+                 },
+                 title: "Password and password confirmation do not match."
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1301,19 +1487,25 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "Missing `data` Member at document's top level.",
-          source: %Source{
-            pointer: ""
-          }
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "Missing `data` Member at document's top level.",
+                 source: %Source{
+                   pointer: ""
+                 }
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1326,17 +1518,23 @@ defmodule Alembic.DocumentTest do
       }]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "JSON parse error - Expecting property name at line 1 column 2 (char 1).",
-          status: "400"
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "JSON parse error - Expecting property name at line 1 column 2 (char 1).",
+                 status: "400"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 
@@ -1354,20 +1552,26 @@ defmodule Alembic.DocumentTest do
       ]
     }
     """
-    error_template = %Error{@error_template | meta: %{"action" => :create, "sender" => :server}}
+    error_template = %Error{
+      @error_template |
+      meta: %{
+        "action" => :create,
+        "sender" => :server
+      }
+    }
     {:ok, document} = Document.from_json(decoded, error_template)
 
     assert document == %Document{
-      errors: [
-        %Error{
-          detail: "The resource does not have an `auther` relationship path.",
-          source: %Source{
-            parameter: "include"
-          },
-          title: "Invalid Query Parameter"
-        }
-      ]
-    }
+             errors: [
+               %Error{
+                 detail: "The resource does not have an `auther` relationship path.",
+                 source: %Source{
+                   parameter: "include"
+                 },
+                 title: "Invalid Query Parameter"
+               }
+             ]
+           }
     assert_idempotent document, error_template
   end
 

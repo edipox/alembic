@@ -15,13 +15,13 @@ defmodule Alembic.Link do
   @human_type "link object"
 
   @meta_options %{
-                  field: :meta,
-                  member: %{
-                    module: Meta,
-                    name: "meta"
-                  },
-                  parent: nil
-                }
+    field: :meta,
+    member: %{
+      module: Meta,
+      name: "meta"
+    },
+    parent: nil
+  }
 
   # Struct
 

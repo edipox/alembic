@@ -23,10 +23,10 @@ defmodule Alembic.SourceTest do
 
   defp assert_idempotent(original) do
     FromJsonCase.assert_idempotent error_template: %Error{
-                                                     source: %Source{
-                                                       pointer: "/errors/0/source"
-                                                     }
-                                                   },
+                                     source: %Source{
+                                       pointer: "/errors/0/source"
+                                     }
+                                   },
                                    module: Source,
                                    original: original
   end

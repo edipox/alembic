@@ -1,11 +1,14 @@
+job_defaults: &job_defaults
+  working_directory: ~/alembic
+  docker:
+    - image: circleci/elixir:1.4.5
+      environment:
+        MIX_ENV: test
+
 version: 2
 jobs:
   build:
-    working_directory: ~/alembic
-    docker:
-      - image: circleci/elixir:1.4.5
-        environment:
-          MIX_ENV: test
+    <<: *job_defaults
     steps:
       - checkout
       - run:
@@ -85,7 +88,9 @@ jobs:
           key: compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
       # `mix compile` picking up need for recompile is NOT guaranteed when the Erlang or Elixir version changes, so
       # don't have a general `mix-compile-{{ checksum "OTP_VERSION.lock" }}` or `mix-compile` key
-
+  dialyze:
+    <<: *job_defaults
+    steps:
       # `mix dialyze --no-analyse` with caching
 
       # no `restore_cache` because it is the same as `mix compile` because they both use `_build` and
@@ -111,8 +116,22 @@ jobs:
           <<: *dialyze_save_cache_mix_exs
           key: dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
-      # Rest ...
-
+      - run: mix dialyze
+  docs:
+    <<: *job_defaults
+    steps:
+      - run:
+          name: mix docs
+          command: |
+            mix docs 2>&1 | tee mix-docs.txt
+            if grep "Closing unclosed backquotes" mix-docs.txt; then exit 1; fi
+  inch:
+    <<: *job_defaults
+    steps:
+      - run: mix inch.report
+  test:
+    <<: *job_defaults
+    steps:
       - run:
           name: "mix test"
           command: mix coveralls.circle
@@ -122,10 +141,20 @@ jobs:
       - store_artifacts:
           path: _build/test/lib/alembic
           destination: Elixir
-      - run: mix dialyze
-      - run:
-          name: mix docs
-          command: |
-            mix docs 2>&1 | tee mix-docs.txt
-            if grep "Closing unclosed backquotes" mix-docs.txt; then exit 1; fi
-      - run: mix inch.report
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build
+      - dialyze:
+          requires:
+            - build
+      - docs:
+          requires:
+            - build
+      - inch:
+          requires:
+            - build
+      - test:
+          requires:
+            - build

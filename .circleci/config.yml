@@ -9,13 +9,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: mix-local-hex
+          name: "mix local.hex"
           command: mix local.hex --force
       - run:
-          name: mix-local-rebar
+          name: "mix local.rebar"
           command: mix local.rebar --force
 
-      # mix-deps-get with caching
+      # mix deps.get with caching
 
       - restore_cache:
           keys:
@@ -26,7 +26,7 @@ jobs:
             - deps
 
       - run:
-          name: mix-deps-get
+          name: "mix deps.get"
           command: mix deps.get --only test
 
       # in case `mix.exs` has changed because of a requirement change
@@ -44,20 +44,32 @@ jobs:
           paths:
             - deps
 
+      # Shared cache key files
+
+      # Open bug/feature request
+      # (https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994/3) that
+      # environment variables from Dockerfiles aren't usable as keys although they'll be in the environment, so convert
+      # environment variables to a file that can be `checksum`ed
+      - run:
+          name: "OTP_VERSION.lock"
+          command: echo "${OTP_VERSION}" > OTP_VERSION.lock
+      - run:
+          name: "ELIXIR_VERSION.lock"
+          command: echo "${ELIXIR_VERSION}" > ELIXIR_VERSION.lock
+
       # mix-compile with caching
 
       - restore_cache:
           keys:
-            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.lock" }}
-            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.exs" }}
-            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}
+            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
       - run:
-          name: mix-compile
           command: mix compile
 
       - save_cache: &mix_compile_save_cache
-          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.lock" }}
+          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
           paths:
             # compiled deps, compiled project, and deps PLT
             - _build
@@ -65,15 +77,15 @@ jobs:
             - /home/circleci/.mix
       - save_cache:
           <<: *mix_compile_save_cache
-          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.exs" }}
+          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
       - save_cache:
           <<: *mix_compile_save_cache
-          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}
+          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
       # `mix compile` picking up need for recompile is NOT guaranteed when the Erlang or Elixir version changes, so
-      # don't have a general `mix-compile-{{ .Environment.OTP_VERSION }}` or `mix-compile` key
+      # don't have a general `mix-compile-{{ checksum "OTP_VERSION.lock" }}` or `mix-compile` key
 
       - run:
-          name: mix-coveralls-circle
+          name: "mix test"
           command: mix coveralls.circle
       - store_test_results:
           path: _build/test/lib/alembic
@@ -81,17 +93,11 @@ jobs:
       - store_artifacts:
           path: _build/test/lib/alembic
           destination: Elixir
-      - run:
-          name: mix-dialyze-no-analyze
-          command: mix dialyze --no-analyse
-      - run:
-          name: mix-dialyze
-          command: mix dialyze
+      - run: mix dialyze --no-analyse
+      - run: mix dialyze
       - run:
           name: mix docs
           command: |
             mix docs 2>&1 | tee mix-docs.txt
             if grep "Closing unclosed backquotes" mix-docs.txt; then exit 1; fi
-      - run:
-          name: mix-inch-report
-          command: mix inch.report
+      - run: mix inch.report

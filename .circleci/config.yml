@@ -14,9 +14,15 @@ jobs:
       - run:
           name: mix-local-rebar
           command: mix local.rebar --force
+      - restore_cache:
+          key: deps-{{ checksum "mix.lock" }}
       - run:
           name: mix-deps-get
           command: mix deps.get --only test
+      - save_cache:
+          key: deps-{{ checksum "mix.lock" }}
+          paths:
+            - deps
       - run:
           name: mix-compile
           command: mix compile

@@ -59,45 +59,57 @@ jobs:
 
       # `mix compile` with caching
 
-      - restore_cache: &build_restore_cache
+      - restore_cache: &compile_restore_cache
+          # prefer dialyze version of cache since it includes both `_build` AND `/home/circleci/.mix`
           keys:
-            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
-            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
-            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+            - compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
       - run:
           command: mix compile
 
-      - save_cache: &build_save_cache_mix_lock
-          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+      - save_cache: &compile_save_cache_mix_lock
+          key: compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
           paths:
-            # compiled deps, compiled project, and deps PLT
+            # compiled deps and compiled project
             - _build
-            # erlang and erlang+elixir PLTs
-            - /home/circleci/.mix
-      - save_cache: &build_save_cache_mix_exs
-          <<: *build_save_cache_mix_lock
-          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
-      - save_cache: &build_save_cache
-          <<: *build_save_cache_mix_exs
-          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+      - save_cache: &compile_save_cache_mix_exs
+          <<: *compile_save_cache_mix_lock
+          key: compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+      - save_cache:
+          <<: *compile_save_cache_mix_exs
+          key: compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
       # `mix compile` picking up need for recompile is NOT guaranteed when the Erlang or Elixir version changes, so
       # don't have a general `mix-compile-{{ checksum "OTP_VERSION.lock" }}` or `mix-compile` key
-
 
       # `mix dialyze --no-analyse` with caching
 
       # no `restore_cache` because it is the same as `mix compile` because they both use `_build` and
       # `/home/circleci/.mix`
+      - restore_cache:
+          keys:
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
       - run: mix dialyze --no-analyse
 
+      - save_cache: &dialyze_save_cache_mix_lock
+          key: dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+          paths:
+            # deps PLT (but also compiled deps and compiled project, so mix compile should prefer this cache)
+            - _build
+            - /home/circleci/.mix
+      - save_cache: &dialyze_save_cache_mix_exs
+          <<: *dialyze_save_cache_mix_lock
+          key: dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
       - save_cache:
-          <<: *build_save_cache_mix_lock
-      - save_cache:
-          <<: *build_save_cache_mix_exs
-      - save_cache:
-          <<: *build_save_cache
+          <<: *dialyze_save_cache_mix_exs
+          key: dialyze-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
       # Rest ...
 

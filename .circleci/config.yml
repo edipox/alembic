@@ -14,6 +14,9 @@ jobs:
       - run:
           name: mix-local-rebar
           command: mix local.rebar --force
+
+      # mix-deps-get with caching
+
       - restore_cache:
           keys:
             - deps-{{ checksum "mix.lock" }}
@@ -21,9 +24,11 @@ jobs:
             - deps-{{ checksum "mix.exs" }}
             # any previous branches deps
             - deps
+
       - run:
           name: mix-deps-get
           command: mix deps.get --only test
+
       # in case `mix.exs` has changed because of a requirement change
       - save_cache:
           key: deps
@@ -38,9 +43,35 @@ jobs:
           key: deps-{{ checksum "mix.lock" }}
           paths:
             - deps
+
+      # mix-compile with caching
+
+      - restore_cache:
+          keys:
+            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.lock" }}
+            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.exs" }}
+            - mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}
+
       - run:
           name: mix-compile
           command: mix compile
+
+      - save_cache: &mix_compile_save_cache
+          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.lock" }}
+          paths:
+            # compiled deps, compiled project, and deps PLT
+            - _build
+            # erlang and erlang+elixir PLTs
+            - /home/circleci/.mix
+      - save_cache:
+          <<: *mix_compile_save_cache
+          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}-{{ checksum "mix.exs" }}
+      - save_cache:
+          <<: *mix_compile_save_cache
+          key: mix-compile-{{ .Environment.OTP_VERSION }}-{{ .Environment.ELIXIR_VERSION }}
+      # `mix compile` picking up need for recompile is NOT guaranteed when the Erlang or Elixir version changes, so
+      # don't have a general `mix-compile-{{ .Environment.OTP_VERSION }}` or `mix-compile` key
+
       - run:
           name: mix-coveralls-circle
           command: mix coveralls.circle

@@ -15,7 +15,7 @@ jobs:
           name: "mix local.rebar"
           command: mix local.rebar --force
 
-      # mix deps.get with caching
+      # `mix deps.get` with caching
 
       - restore_cache:
           keys:
@@ -57,32 +57,49 @@ jobs:
           name: "ELIXIR_VERSION.lock"
           command: echo "${ELIXIR_VERSION}" > ELIXIR_VERSION.lock
 
-      # mix-compile with caching
+      # `mix compile` with caching
 
-      - restore_cache:
+      - restore_cache: &build_restore_cache
           keys:
-            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
-            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
-            - mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
 
       - run:
           command: mix compile
 
-      - save_cache: &mix_compile_save_cache
-          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+      - save_cache: &build_save_cache_mix_lock
+          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
           paths:
             # compiled deps, compiled project, and deps PLT
             - _build
             # erlang and erlang+elixir PLTs
             - /home/circleci/.mix
-      - save_cache:
-          <<: *mix_compile_save_cache
-          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
-      - save_cache:
-          <<: *mix_compile_save_cache
-          key: mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+      - save_cache: &build_save_cache_mix_exs
+          <<: *build_save_cache_mix_lock
+          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+      - save_cache: &build_save_cache
+          <<: *build_save_cache_mix_exs
+          key: build-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
       # `mix compile` picking up need for recompile is NOT guaranteed when the Erlang or Elixir version changes, so
       # don't have a general `mix-compile-{{ checksum "OTP_VERSION.lock" }}` or `mix-compile` key
+
+
+      # `mix dialyze --no-analyse` with caching
+
+      # no `restore_cache` because it is the same as `mix compile` because they both use `_build` and
+      # `/home/circleci/.mix`
+
+      - run: mix dialyze --no-analyse
+
+      - save_cache:
+          <<: *build_save_cache_mix_lock
+      - save_cache:
+          <<: *build_save_cache_mix_exs
+      - save_cache:
+          <<: *build_save_cache
+
+      # Rest ...
 
       - run:
           name: "mix test"
@@ -93,7 +110,6 @@ jobs:
       - store_artifacts:
           path: _build/test/lib/alembic
           destination: Elixir
-      - run: mix dialyze --no-analyse
       - run: mix dialyze
       - run:
           name: mix docs

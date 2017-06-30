@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/alembic
+    docker:
+      - image: circleci/elixir:1.4.5
+        environment:
+          MIX_ENV: test
+    steps:
+      - checkout
+      - run:
+          name: mix-local-hex
+          command: mix local.hex --force
+      - run:
+          name: mix-local-rebar
+          command: mix local.rebar --force
+      - run:
+          name: mix-deps-get
+          command: mix deps.get --only test
+      - run:
+          name: mix-compile
+          command: mix compile
+      - run:
+          name: mix-coveralls-circle
+          command: mix coveralls.circle
+      - store_test_results:
+          path: _build/test/lib/alembic/test-junit-report.xml
+      # so test results show up as downloadable artifacts
+      - store_artifacts:
+          path: _build/test/lib/alembic/test-junit-report.xml
+          destination: Elixir
+      - run:
+          name: mix-dialyze-no-analyze
+          command: mix dialyze --no-analyse
+      - run:
+          name: mix-dialyze
+          command: mix dialyze
+      - run:
+          name: mix docs
+          command: |
+            mix docs 2>&1 | tee mix-docs.txt
+            if grep "Closing unclosed backquotes" mix-docs.txt; then exit 1; fi
+      - run:
+          name: mix-inch-report
+          command: mix inch.report

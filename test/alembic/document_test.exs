@@ -226,7 +226,8 @@ defmodule Alembic.DocumentTest do
       @error_template |
       meta: %{
         "action" => :fetch,
-        "sender" => :server}
+        "sender" => :server
+      }
     }
     {:ok, document} = Document.from_json(decoded, error_template)
 

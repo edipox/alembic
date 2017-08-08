@@ -31,7 +31,7 @@ defmodule Alembic.Mixfile do
       source_url: "https://github.com/C-S-D/alembic",
       start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "3.3.0"
+      version: "3.4.0"
     ]
   end
 
@@ -49,7 +49,7 @@ defmodule Alembic.Mixfile do
   defp deps do
     [
       # static code analysis for style and consistency
-      {:credo, "~> 0.8.1", only: [:dev, :test]},
+      {:credo, "0.8.5", only: [:dev, :test]},
       # success type checker: ensures @type and @spec are valid
       {:dialyze, "~> 0.2.1", only: [:dev, :test]},
       # markdown to HTML converter for ex_doc
@@ -113,7 +113,10 @@ defmodule Alembic.Mixfile do
         "Docs" => "https://hexdocs.pm/alembic",
         "Github" => "https://github.com/C-S-D/alembic",
       },
-      maintainers: ["Luke Imhoff"]
+      maintainers: [
+        "Luke Imhoff",
+        "Jeff Utter"
+      ]
     ]
   end
 end

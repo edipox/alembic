@@ -50,6 +50,173 @@ defmodule Alembic.ToEctoSchema do
 
   # Functions
 
+  @doc """
+  Converts nested `params` to nested `ecto_schema_module` and its associations.
+
+  ## `belongs_to`
+
+  `belongs_to` associations look for the foreign key in the params and set it in the `Ecto.Schema.t`
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "post_id" => 1,
+      ...>     "text" => "Comment Text"
+      ...>   },
+      ...>   Alembic.TestComment
+      ...> )
+      %Alembic.TestComment{
+         post_id: 1,
+         text: "Comment Text"
+      }
+
+  The assocation can also have nested params.
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "post" => %{
+      ...>       "id" => 1,
+      ...>       "text" => "Post Text"
+      ...>     },
+      ...>     "text" => "Comment Text"
+      ...>   },
+      ...>   Alembic.TestComment
+      ...> )
+      %Alembic.TestComment{
+         post: %Alembic.TestPost{
+           id: 1,
+           text: "Post Text"
+         },
+         post_id: 1,
+         text: "Comment Text"
+      }
+
+  Neither the nested id nor the foreign key is required to be set
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "post" => %{
+      ...>       "text" => "Post Text"
+      ...>     },
+      ...>     "text" => "Comment Text"
+      ...>   },
+      ...>   Alembic.TestComment
+      ...> )
+      %Alembic.TestComment{
+         post: %Alembic.TestPost{
+           text: "Post Text"
+         },
+         text: "Comment Text"
+      }
+
+  When the association can be marked as empty with `nil` in the params
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "post" => nil,
+      ...>     "text" => "Comment Text"
+      ...>   },
+      ...>   Alembic.TestComment
+      ...> )
+      %Alembic.TestComment{
+         post: nil,
+         text: "Comment Text"
+      }
+
+  The id of the nested association params will override the foreign key when both are given
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "post" => %{
+      ...>       "id" => 1
+      ...>     },
+      ...>     "post_id" => 2
+      ...>   },
+      ...>   Alembic.TestComment
+      ...> )
+      %Alembic.TestComment{
+         post: %Alembic.TestPost{
+           id: 1
+         },
+         post_id: 1
+      }
+
+  ## `has_many`
+
+  `has_many` associations look for nested parameters in an array
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "comments" => [
+      ...>       %{
+      ...>         "id" => 1,
+      ...>         "text" => "Comment 1"
+      ...>       },
+      ...>       %{
+      ...>         "id" => 2,
+      ...>         "text" => "Comment 2"
+      ...>       }
+      ...>     ]
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %Alembic.TestPost{
+        comments: [
+          %Alembic.TestComment{
+            id: 1,
+            text: "Comment 1"
+          },
+          %Alembic.TestComment{
+            id: 2,
+            text: "Comment 2"
+          }
+        ]
+      }
+
+  ## `has_one`
+
+  `has_one` association look for nested parameters
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "profile" => %{
+      ...>       "image_url" => "https://example.com/image.png"
+      ...>     }
+      ...>   },
+      ...>   Alembic.TestAuthor
+      ...> )
+      %Alembic.TestAuthor{
+        profile: %Alembic.TestProfile{
+          image_url: "https://example.com/image.png"
+        }
+      }
+
+  # `many_to_many`
+
+  `many_to_many` work the same way as `has_many`: associations parameters are nested in an array
+
+      iex> Alembic.ToEctoSchema.to_ecto_schema(
+      ...>   %{
+      ...>     "tags" => [
+      ...>       %{"name" => "first"},
+      ...>       %{"name" => "second"}
+      ...>     ],
+      ...>     "text" => "Tagged Post"
+      ...>   },
+      ...>   Alembic.TestPost
+      ...> )
+      %Alembic.TestPost{
+        tags: [
+          %Alembic.TestTag{
+            name: "first"
+          },
+          %Alembic.TestTag{
+            name: "second"
+          }
+        ],
+        text: "Tagged Post"
+      }
+
+  """
   @spec to_ecto_schema(ToParams.params, ecto_schema_module) :: struct
   def to_ecto_schema(params, ecto_schema_module) when is_atom(ecto_schema_module) do
     changeset = Changeset.cast(ecto_schema_module.__struct__, params, ecto_schema_module.__schema__(:fields))

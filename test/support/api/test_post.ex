@@ -12,5 +12,6 @@ defmodule Alembic.TestPost do
 
     belongs_to :author, Alembic.TestAuthor
     has_many :comments, Alembic.TestComment
+    many_to_many :tags, Alembic.TestTag, join_through: "posts_tags", on_replace: :delete
   end
 end

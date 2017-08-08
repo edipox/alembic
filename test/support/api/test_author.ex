@@ -9,5 +9,6 @@ defmodule Alembic.TestAuthor do
     field :name, :string
 
     has_many :posts, Alembic.TestPost, foreign_key: :author_id
+    has_one :profile, Alembic.TestProfile, foreign_key: :author_id
   end
 end

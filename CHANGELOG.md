@@ -3,46 +3,97 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v3.3.0](#v330)
+  - [v3.4.0](#v340)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
-  - [v3.2.0](#v320)
+  - [v3.3.0](#v330)
     - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes-1)
-  - [v3.1.1](#v311)
-    - [Bug Fixes](#bug-fixes-2)
-  - [v3.1.0](#v310)
+  - [v3.2.0](#v320)
     - [Enhancements](#enhancements-2)
+    - [Bug Fixes](#bug-fixes-2)
+  - [v3.1.1](#v311)
     - [Bug Fixes](#bug-fixes-3)
-  - [v3.0.0](#v300)
+  - [v3.1.0](#v310)
     - [Enhancements](#enhancements-3)
     - [Bug Fixes](#bug-fixes-4)
+  - [v3.0.0](#v300)
+    - [Enhancements](#enhancements-4)
+    - [Bug Fixes](#bug-fixes-5)
     - [Incompatible Changes](#incompatible-changes)
   - [v2.4.0](#v240)
-    - [Enhancements](#enhancements-4)
-  - [v2.3.0](#v230)
     - [Enhancements](#enhancements-5)
-    - [Bug Fixes](#bug-fixes-5)
-  - [v2.2.0](#v220)
+  - [v2.3.0](#v230)
     - [Enhancements](#enhancements-6)
-  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-6)
-  - [v2.1.0](#v210)
+  - [v2.2.0](#v220)
     - [Enhancements](#enhancements-7)
+  - [v2.1.1](#v211)
     - [Bug Fixes](#bug-fixes-7)
-  - [v2.0.1](#v201)
-    - [Bug Fixes](#bug-fixes-8)
-  - [v2.0.0](#v200)
+  - [v2.1.0](#v210)
     - [Enhancements](#enhancements-8)
+    - [Bug Fixes](#bug-fixes-8)
+  - [v2.0.1](#v201)
     - [Bug Fixes](#bug-fixes-9)
+  - [v2.0.0](#v200)
+    - [Enhancements](#enhancements-9)
+    - [Bug Fixes](#bug-fixes-10)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-9)
+    - [Enhancements](#enhancements-10)
     - [Incompatible Changes](#incompatible-changes-2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v3.4.0
+
+### Enhancements
+* [#44](https://github.com/C-S-D/alembic/pull/44) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Alembic.Document.from_ecto_changeset/2` converts the `errors` in `ecto_changeset` to `Alembic.Error.t` in a single `Alembic.Document.t`.  Bypasses a [bug in `JaSerializer`](https://github.com/vt-elixir/ja_serializer/blob/b5d9f1da736c3a9c6b42da34d35dafb7ce93879e/lib/ja_serializer/ecto_error_serializer.ex#L73-L81) where it assumes all fields that don't end in `_id` are attribute names, which leads to association names (as opposed to their foreign key) being put under `/data/attributes`.  `Alembic.Document.from_ecto_changeset` reflects on the `Ecto.Changeset.t` `data` struct module to get the `__schema__/1` information from the `Ecto.Schema.t`.  It also assumes that if the field maps to no known attribute, association or foreign key, then the error should not have an `Alembic.Source.t` instead of defaulting to `/data/attributes`.
+  * Update `circle.yml`
+      * Erlang `19.3`
+      * Elixir `1.4.2`
+* [#45](https://github.com/C-S-D/alembic/pull/45) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Alembic.Pagination.Page.count` calculates the number of pages given the page `size` and the `total_size` of resources to be paginated.
+  * `Alembic.Pagination.Page.first` returns the `Alembic.Pagination.Page.t` for the `first` for `Alembic.Pagination.t` given any page and the page count.
+  * `Alembic.Pagination.Page.last` is the last page for `Alembic.Pagination.t` given any page and the page count.
+  * `Alembic.Pagination.Page.next` is the next page after the current `page`.  If `page` `number` matches `count`, then it must be the last page and so next will be `nil`.
+  * `Alembic.Paginaton.Page.previous` is the previous page to the current `page`.  If the `page` `number` is `1`, then it is the first page, and the previous page is `nil`.
+  * `Alembic.Pagination.Page.to_pagination` takes the current `page` and the `total_size` of resources to paginated and produces the `Alembic.Pagination` with `first`, `last`, `next`, and
+  `previous` around that `page`.  If `page` `number` is greater than the calculated page count `{:error, Alembic.Document.t}` is returned instead of `{:ok, Alembic.Pagination.t}`.
+  * `Alembic.FromJson.integer_from_json`
+  * `Alembic.FromJson.integer_to_positive_integer` takes an integer and returns it if positive, otherwise returns error `Document` if `0` or below.
+  * `Alembic.Pagination.Page.from_params` parses param format with quoted integer page number and size or JSON format with integer page number and size.
+  * Allow pagination opt-out with `%{"page" => nil}`.  `Alembic.Pagination.Page.from_params(%{"page" => nil})` will return `{:ok, :all}` while no `"page"` param will return `{:ok, nil}`.
+  * Update dependencies
+    * Update `ex_doc` to `0.16.1`
+    * Update `excoveralls` to `0.7.0`
+    * Update `credo` to `0.8.1`
+* [#46](https://github.com/C-S-D/alembic/pull/46) - Use IntelliJ Elixir formatter for make the formatting consistent - [@KronicDeth](https://github.com/KronicDeth)
+* [#47](https://github.com/C-S-D/alembic/pull/47) - [@KronicDeth](https://github.com/KronicDeth)
+  * Convert to CircleCI 2.0
+    * Turn on workflows, so that `build`, which includes `mix deps.get` and `mix compile` is a dependency of all, but `mix dialyze`, `mix docs`, `mix inch.report`, and `mix coveralls.circleci` can run in parallel after it.
+* [#48](https://github.com/C-S-D/alembic/pull/48) - Wrap `}` after wrapped keys - [@KronicDeth](https://github.com/KronicDeth)
+* [#49](https://github.com/C-S-D/alembic/pull/49)
+    * Support `many_to_many` associations in `Alembic.ToEctoSchema.to_ecto_schema/2` - [@jeffutter](https://github.com/jeffutter)
+    * `Alembic.ToEctoSchema.to_ecto_schema/2` `doctest`s - [@KronicDeth](https:/github.com/KronicDeth)
+      * Increase code coverage to 95.5%
+      * Cover new `many_to_many` support
+    * Update dependencies - [@KronicDeth](https:/github.com/KronicDeth)
+      * `credo` `0.8.5`
+      * `ecto` `2.1.6`
+      * `ex_doc` `0.16.2`
+      * `excoveralls` `0.7.2`
+
+### Bug Fixes
+* [#45](https://github.com/C-S-D/alembic/pull/45) - [@KronicDeth](https://github.com/KronicDeth)
+  * Allow `next` and `previous` to be `nil` in `Pagination.t` `@type` since they were already allowed to be `nil` in use for the last and first page, respectively.
+  * `Alembic.Pagination.Page` `number` is `pos_integer` because `non_neg_integer` allows 0, but that's not valid because `number` is 1-based, not 0-based.
+  * Remove extra blank lines from `@doc`s
+  * Switch to github version of `earmark` to get bug fix in pragdave/earmark#144.
+  * Remove spaces inside `{ }`.
 
 ## v3.3.0
 

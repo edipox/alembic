@@ -31,7 +31,7 @@ defmodule Alembic.Mixfile do
       source_url: "https://github.com/C-S-D/alembic",
       start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "3.3.0"
+      version: "3.4.0"
     ]
   end
 
@@ -113,7 +113,10 @@ defmodule Alembic.Mixfile do
         "Docs" => "https://hexdocs.pm/alembic",
         "Github" => "https://github.com/C-S-D/alembic",
       },
-      maintainers: ["Luke Imhoff"]
+      maintainers: [
+        "Luke Imhoff",
+        "Jeff Utter"
+      ]
     ]
   end
 end
